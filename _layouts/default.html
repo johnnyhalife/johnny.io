@@ -1,64 +1,102 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
-   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-   <title>{{ page.title }}</title>
-   <meta name="author" content="Tom Preston-Werner" />
-   <link href="http://feeds.feedburner.com/tom-preston-werner" rel="alternate" title="Tom Preston-Werner" type="application/atom+xml" />
+    <meta charset="utf-8">
+    <title>{{ page.title }}</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-   <!-- syntax highlighting CSS -->
-   <link rel="stylesheet" href="/css/syntax.css" type="text/css" />
+    <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-   <!-- Homepage CSS -->
-   <link rel="stylesheet" href="/css/screen.css" type="text/css" media="screen, projection" />
+    <!-- Le styles -->
+		<link rel="stylesheet" href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css">
+    <style type="text/css">
+			div.container {
+				-moz-box-shadow: 0 0 5px #888;
+				-webkit-box-shadow: 0 0 5px#888;
+				box-shadow: 0 0 10px #888;
+			}
+			
+			div.container article {
+				padding: 20px;
+				width: 800px;
+				clear: both;
+				margin: 0px auto;
+			}
+			
+			div.container div#related {
+				padding: 20px;
+				width: 720px;
+			}
+			
+			div.container {
+				background: #fefefe;
+			}
+			
+			body {
+				background: #F6F6F6 ;
+			}
+			
+			hr {
+				width: 600px;
+				margin: 0px auto;
+			}
+			
+			div.container article p{
+				text-align: justify;
+			}
+			
+			div.hero-unit {
+				padding: 10px 40px;
+				margin-bottom: 0px;
+			}
+			
+			div.hero-unit p {
+				margin-top: 10px;
+			}
+			
+			div.hero-unit span.label {
+				font-size: 17px;
+			}
+			
+			div.hero-unit span.label a, div.hero-unit span.label a:hover, div.hero-unit span.label a:active, div.hero-unit span.label a:visited{
+				color: #fefefe;
+			}
+			
+			div.pagination {
+				margin: 10px auto;
+				width: 550px;
+			}
+				
+			footer {
+				width: 100%;
+				background: rgba(0,0,0,0.8);
+				color: #fefefe;
+				height: 16px;
+			}
+			
+			footer p {
+				text-align: center;
+				text-shadow: black 0.1em 0.1em 0.2em;
+				margin: -10px 0;
+				
+			}
+			
+			footer p a, footer p a:hover, footer p a:visited {
+				color: #efaa09;
+			}
+    </style>
+  </head>
 
-   <!-- Typekit -->
-   <script type="text/javascript" src="http://use.typekit.com/jpd0pfm.js"></script>
-   <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-</head>
-<body>
-
-<div class="site">
-  <div class="title">
-    <a href="/">Tom Preston-Werner</a>
-    <a class="extra" href="/">home</a>
-  </div>
-  
-  {{ content }}
-  
-  <div class="footer">
-    <div class="contact">
-      <p>
-        Tom Preston-Werner<br />
-        Cofounder of <a href="http://github.com/">GitHub</a><br />
-        tom@mojombo.com
-      </p>
-    </div>
-    <div class="contact">
-      <p>
-        <a href="http://github.com/mojombo/">github.com/mojombo</a><br />
-        <a href="http://twitter.com/mojombo/">twitter.com/mojombo</a><br />
-        <a href="http://flickr.com/photos/mojombo/">flickr.com/photos/mojombo</a>
-      </p>
-    </div>
-    <div class="rss">
-      <a href="http://feeds.feedburner.com/tom-preston-werner">
-        <img src="/images/rss.png" alt="Subscribe to RSS Feed" />
-      </a>
-    </div>
-  </div>
-</div>
-
-<a href="http://github.com/mojombo"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub" /></a>
-
-<script type="text/javascript">
-var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-</script>
-<script type="text/javascript">
-var pageTracker = _gat._getTracker("UA-6016902-1");
-pageTracker._trackPageview();
-</script>
-
-</body>
+  <body>
+    <div class="container">
+		  {{ content }}
+    </div> <!-- /container -->
+    <footer>
+      <p>&copy; <a href="http://twitter.com/johnnyhalife">johnnyhalife</a></p>
+    </footer>
+  </body>
 </html>
