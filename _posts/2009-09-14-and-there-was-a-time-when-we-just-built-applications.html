@@ -1,0 +1,73 @@
+--- 
+layout: post
+title: And there was a time when we just built applications...
+published: true
+meta: 
+  _edit_last: "42"
+  _edit_lock: "1252942195"
+tags: []
+
+type: post
+status: publish
+---
+The 90's, beginning of the Internet as mainstream as we know it right now. Those were times where just a few of us knew what computers were about, you won't hear people on the metro talking about Gigas, Teras, iPods or DivX. It was quiet, and computers were just for Information Workers and lived on offices, although some people have their own at home, it wasn't that common as today.
+
+Software Development was also different then, it was a pretty streamlined process where a <em>Requirements Engineer </em>went to an office, analyzed how people behave on their daily basis, and then some programmer put together a couple of lines of code just to ease those proceseses.
+
+That was an application, people thought about computer programs as a bunch of CRUD screens, that eased their daily work by cutting the clutter of working with papers. But, of course, it had problems since people was limited on what they can do with it, and innovation did not come from that side.
+
+Not everything was bad, since it was the beginning of a new era, what we call today "Emergent Behavior" started then not as we look at it today but those fixed forms application made people find a workaround for fulfilling their on business needs.
+<h2>Emergent Behavior</h2>
+Let's start easy by defining it, according to <a href="http://en.wikipedia.org">wikipedia</a>:
+<blockquote>An emergent behavior or emergent property can appear when a number of simple entities (agents) operate in an environment, forming more complex behaviors as a collective. If emergence happens over disparate size scales, then the reason is usually a causal relation across different scales. In other words there is often a form of top-down feedback in systems with emergent properties. The processes from which emergent properties result may occur in either the observed or observing system, and can commonly be identified by their patterns of accumulating change, most generally called 'growth'.</blockquote>
+Now let's analyze the definition by applying it to Software Engineering:
+<blockquote>Peter and Sally work on a company, both of them are sales team. They have a system that let's them load their sales and then have a report of sales or a subgroup of them by just making a search and pressing the report button.
+
+One day, Sally decides that it would be great if they can have the same sales report they do daily but independently for each distribution hub of their company. Their system doesn't have that ability but they figured out that if they label each sale with tag like "<em>[phone-sale]</em>" or "<em>[store-pickup]</em>" they will be able to easily perform that report leveraging the search + export functionality (previously mentioned).
+
+From now on, they have enhanced their process, added value to the business by just innovating with the existing features of the application, thew will simply label sales, search for that label and make their report.</blockquote>
+On the previous sample, we have seen how people may react to a system and how they can outperform by just using whatever is already on the system.
+
+We as software people (architects, developers, managers, whatever) tend to think that our system is complete and has 1:1 mapping with the real business. But that's often (if not always) misleading. If we were the architects of the system on the sample, what we would do? 80% (just an estimation) will say: "Oh that's something that the sales team didn't tell us we should probably go and build that feature into the software so we ease their life". In my opinion that's terribly wrong.
+
+Nowadays the rate of change of the equation of people + business + information moves faster than never, <strong>we sometimes confuse the domain of the problem with a particular problem of an application</strong>. In the case above we should be probably look for a solution that helps people to manage their data in an unstructured way as they want (like tagging). Instead of adding a new layer of complexity to the system, we will just enable people to adapt the system to their needs.
+<h2>Enabling people and that's what this is all about</h2>
+<img class="alignright" style="float: right;margin-right: 20px" src="http://files.me.com/johnny.halife/04dozk" alt="" width="252" height="172" />
+
+It started on the early days with the Apple II and the VisiCalc, a piece of software the enabled people to read and write tabular data, then it was Microsoft Excel that enables people like my father to run their own software to run his own business. And the star of this is twitter, enabling communications that are valid (or at least important for a short period of time).
+<h3>Why twitter has become so important?</h3>
+It was the early days of the Web 2.0 when the creators of twitter published it, it didn't have lot of sense to have an online application that enable people to write up 140 characters and select people that will be able to read it and also having the ability to read others tweets.
+<p style="text-align: center"><img class="aligncenter" style="vertical-align: middle" src="http://files.me.com/johnny.halife/lwc7sg" alt="" width="672" height="376" /></p>
+It did not make sense until the iPhone came out, and that was a boom, that 140 characters enable people to say where they were, what they were looking at, or how they were feeling. Lots and lots of services came out like posting pictures or geo-location references, +100 of clients were written for it, and twitter stayed the same.
+
+Twitter pals started looking at what people were doing, at the results of the collective intelligence, for example the hash-tagging for trending topics or people looking for those trends on the web. And they just worked out those parts.
+
+Now twitter also servers as the #1 Information Delivery Mechanism for people all over the worlds, digital media is into twitter and even stock prices are notified via twitter.
+
+What did twitter do? They just enhanced application aspects like performance, searching and API tweaks not modifying their core functionality for sake of having more functionality,  just changed anything needed to enable more for end-users.
+<h2>So what?</h2>
+<strong>We live on the era where information flows too fast and too furious for us, more than we can manage and more than we can imagine.</strong> Back on the 90's as I said on the beginning of this post probably projects like twitter might end up having a "Twitter Finance" or "Twitter Media" feature.
+
+What's wrong on adding features based on what people do? There's nothing wrong about it, but what is often confused is what people is doing. For example, what do I, Twitter Stock Exchange and NY Times Publishing on twitter have in common?
+
+From a 90's Requirements Engineering point of view absolutely nothing. From a collective intelligence point of view, everything we are all trying to put information that has value for a short period of time and that sometimes falls under an specific trend or category. If I were twitter's architect I will probably look into making twitter easy for the general use case (sharing information) instead of looking for adding an specific feature built-in to the system.
+<h3>Getting started with Emergent Behaviors Design</h3>
+<strong>"We are what we do", and that's it</strong>. No matter what we thought for the application intend it will end up being what people are doing with it. <strong>A system is only the result of what their users do.</strong>
+
+Having the previous paragraph, let's create a small list of things that you have to consider when designing for emergent behaviors aware applications:
+<ol>
+	<li><strong>Know your domain.</strong> Excel knows that it's domain is cells and columns and everything must be optimized for working on that domain and keep it as small as possible.</li>
+	<li><strong>Do not confuse domain with features.</strong> If you looking into something, and trying to solve a problem try to differentiate what people is looking forward doing with it instead of solving the actual problem.</li>
+	<li><strong>Do not map features and use cases 1:1. </strong> Try to enable more and do less, invest on what is worth and what will keep your system alive, there's one principle that we cannot avoid when thinking of a software product "whatever becomes useless end up on the trash can".</li>
+	<li><strong>Define what you wanna do.</strong> Software lifespan is really reduced nowadays, enable the more for the time being "alive" and know that at some point in time will be better to back off and come back with a new product.</li>
+	<li><strong>Constraints, constraints, constraints. </strong>Define a model, define a language, and define operations over the model. The rest will be open for end users but have definitions, everything isn't a plain text (or formatted text file) business value comes from this constraints, and this is what will difference you from having your whole enterprise using Microsoft Excel for every application.</li>
+	<li><strong>Be open minded. </strong>Once you set up your system constraints, do not try to interfere with how people interact with your application telling them "oh that wasn't supposed to be that way".</li>
+	<li><strong>Open your API.</strong> Having people accessing your model will constraint it even more, and the result will be people leveraging your model, your language and the operations you defined in a whole different way, and that what generates business values (and evolves your business).</li>
+	<li><strong>Keep a consistent interface to your data. </strong>Learned from Gmail's label operator where you can search for email that is unread or fall under an specific category.</li>
+	<li><strong>Have logging and tracing mechanisms. </strong>Understand how do your users interact with the system is what will help you make it better.</li>
+	<li><strong>Plant a seed and watch them grow. </strong>Have an agile process, get your system on the field as soon as you can and start watching it, people may not realized that they have changed the requirements but your job will be to understand those behaviors and combined with the previous point will let you enhance your product as whole, sticking always to the reality.</li>
+</ol>
+Remember, <strong>there's no silver bullet on software design, there's no one-size-fits-all, and there's no product that can last forever</strong>. When facing your next development challenge think in terms of what may people end up doing with this, which is my domain, or how will I enable people to restructure the data. Then just work on
+
+Read you soon,
+~johnny

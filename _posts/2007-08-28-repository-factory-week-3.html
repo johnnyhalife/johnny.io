@@ -1,0 +1,45 @@
+--- 
+layout: post
+title: "Repository Factory - Week #3"
+published: true
+meta: {}
+
+tags: 
+- Architecture
+- cool stuff
+- Guidance
+- Patterns &amp; Practices
+- Repository Factory
+- solution architecture
+type: post
+status: publish
+---
+
+        <p>As I promised when we launch this project, I'm reporting each week the progress that we've accomplished in the past week.  This week has been mostly QA and a highly valuable improvement.</p> <h3>Improved wizard reentrancy</h3> <p>Last week we've accomplished wizard reentrancy for <em>Create repository recipe</em>, but we had a bug where we're not persisting the <em>Identity </em>for each operation (when it applies). Now we've added the <em>Identity</em> to the recipe state file as depicted below.</p> <p><a title="2007082801" href="http://www.flickr.com/photos/67651183@N00/1254524176/"><img alt="2007082801" src="http://static.flickr.com/1196/1254524176_920e1efc25.jpg" border="0"></a></p> <h3>Fixed mapping duplication</h3> <p>When you had a stored procedure that uses a parameter and it's also included on the as <em>ReturnValue </em>it appear twice in the mappings. Now we've fixed this by adding the parameter direction on the recipe state file. How now a parameter looks like</p> <div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace"><span style="color: #0000ff">&lt;</span><span style="color: #800000">parameter</span> <span style="color: #ff0000">propertyName</span><span style="color: #0000ff">="Name"</span> <span style="color: #ff0000">parameterName</span><span style="color: #0000ff">="pty_Name"</span> <span style="color: #ff0000">parameterDirection</span><span style="color: #0000ff">="6"</span> <span style="color: #0000ff">/&gt;</span></pre></div>
+<h3>Enabled recipes to run on IIS hosted project </h3>
+<p>We've done a small fix to the <strong>GetConfigurationAction </strong>that allows you to run the recipes that uses configuration file on web sites that are not on File-System.</p>
+<h3>Place generated code on folders by entity</h3>
+<p>This was the major improvement for this week. Previously when you generated a repository, all the files that comes along with it where added to the root of the <em>Data Access Project.</em>  Chris figured out that once we've the <strong>RepositoryFactory.Create</strong> you no longer needed to be aware of those file and generated repository implementation neither. Now this is how your data access project will look like. </p>
+<p><a title="2007082802" href="http://www.flickr.com/photos/67651183@N00/1253754773/"><img alt="2007082802" src="http://static.flickr.com/1243/1253754773_df9de7d628.jpg" border="0"></a></p>
+<p>This improvement has a couple of benefits:</p>
+<ol>
+<li>If you want to get rid of the generated code and maintain just the interface, now you just have to remove the<em><strong> {EntityName}RepositoryArtifacts</strong></em> folder. 
+<li><strong>All the generated code is encapsulated in a single folder</strong>, so you don't have to be aware of how many files and the implementation details since you're relying on the factory. 
+<li>In addition to the <strong>RepositoryFactory.Create()</strong> this will keep your projects not aware of where the generated files are.</li></ol>
+<p>Finally, if you use the generated stuff as showed below, <strong>you'll just have to include a <em>Using </em>to </strong><em><strong>DataAccessProjectNamespace</strong>.</em></p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace"><span style="color: #0000ff">using</span> ClassLibrary17;
+<span style="color: #0000ff">using</span> Microsoft.Practices.Repository;
+
+<span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">class</span> Class1
+{
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">void</span> Main()
+    {
+        IPersonRepository repository = 
+                                RepositoryFactory.Create();
+    }
+}</pre></div>
+<p>This week we're probably tackling the rework of the UI. We want to make the factory more usable, since we consider the usability as a core part for software factories.</p>
+<h3>Summary</h3>
+<p>We finished another week, all the tackled issues were not invented by us, they are community requests. We're listening to you, please feel free to provide feedback in our <a href="http://www.codeplex.com/RepositoryFactory">community site</a>. We work on the improvements starting with highly ranked ones, you have a chance to influence the course of the project.</p>
+<p>thanks,<br>~johnny</p>
+      

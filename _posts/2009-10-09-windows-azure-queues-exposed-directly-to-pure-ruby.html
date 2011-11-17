@@ -1,0 +1,71 @@
+--- 
+layout: post
+title: Windows Azure Queues exposed directly to pure Ruby!
+published: true
+meta: 
+  _edit_last: "42"
+  _edit_lock: "1303505220"
+tags: []
+
+type: post
+status: publish
+---
+Hey Pals! As you might recall two days ago <a href="blogs.southworks.net/jhalife/2009/10/06/consuming-windows-azure-blob-storage-from-ruby/">I've published an API called "waz-blobs" that enabled Ruby Developers to get the best from Windows Azure storage</a> straight from their pure ruby code. I told you I won't stop there, so now I'm proud to announce that I've created <a href="http://github.com/johnnyhalife/waz-queues/">waz-queues</a>. As you can imagine and given the fact that I wasn't creative at the time I named this things (If I had a dog I'd name it dog), this API exposes Windows Azure Queues to Ruby Developers (and IronRuby Devs too!).
+
+Like the previous API, it's 100% pure ruby, relays on <a href="http://github.com/adamwiggins/rest-client/">RestClient written by Adam Wiggins</a> and was written and tested on Mac and Ubuntu.
+
+As on the <a href="http://blogs.southworks.net/jhalife/2009/10/06/consuming-windows-azure-blob-storage-from-ruby/">previous post</a> I wrote about the Blobs API,  this post isn't about API documentation. It's about all those things that forced me to write the API and some other random thoughts about where this whole thing is going.
+<h2>Oh, you did it again!</h2>
+Yes! I love it, interoperability is my passion, I love to write things to demonstrate that they can work with other very different things, and given the fact that Microsoft did a great job when they <a href="http://msdn.microsoft.com/en-us/library/dd179363.aspx">published the Windows Azure Storage Queue API on line</a>, I decided I'll spend some time building this. Queues are great, async programming is cool and REST is something that people do not believe until they see it (for those skeptical devs this is fully implemented over HTTP Stack on pure Ruby)
+<h2>There's nothing worse than waiting inline. Bummer!</h2>
+Welcome to the twentieth one century, we live surrounded by the buzz and the current one is called "Cloud Computing". Although I won't discuss the topic here, it relays on a very simple principle <em>"pay-to-play"</em>. If you want to handle more requests just increase the number of workers and decrease the number of money you've got on your pockets.
+
+Not all the operations on a System need to be always consistent, Amazon cart is an example of that. When you don't want to pay more just get a queue, do some work async, and voila! your problems are solved.
+
+Some hosting platforms like <a href="http://heroku.com">Heroku</a> o <a href="http://lx.azure.microsoft.com">Windows Azure</a> have a limited number of requests that they can handle with a single machine/worker/dyno/you_name_it, when the backlog becomes to big they start to deflect request with HTTP 500 messages. If you relay on a queue you will also have a way to increase responsiveness on your app, sites like <a href="http://digg.com">digg</a> and<a href="http://twitter.com"> twitter.com </a>already do something similar.
+<h2>Why do I need Azure Queues?</h2>
+It's an extremely powerful alternative to having a File System Queue or archaic Queue Systems like MSMQ, it's on the cloud, it's unlimited storage growth and can be used from either your current hosting or Windows Azure.
+
+The whole Queue Service provided by Windows Azure it's really simple but not least powerful. Possibilities are endless, and you can do whatever you want and create a multi-party system that has your web app hosted on Heroku written in pure ruby, a back end service running on Windows Azure written on C# and a python app hosted on Google Apps engine that uses Windows Azure Queues to communicate with each other. There's no limit! (Even your mainframe can handle WAZ-Queues with some C HTTP Lib + playing nice with sockets).
+<h2>Ok, I buy it, now show me your magic</h2>
+The API is pretty simple, simpler than anything I've written before. Here's a snippet that illustrates basic API interaction (or in other words, everything you need from a queue)
+<h3>Getting started</h3>
+<pre style="font-size: 16px;padding: 2px;color: #333">sudo gem install waz-queues --source http://gemcutter.org</pre>
+<h3>Reference Code</h3>
+<pre style="font-size: 12px;padding: 2px;color: #333;border: 1px solid">  require 'waz-queues'
+
+        service = WAZ::Queues::Base.establish_connection!(:account_name =&gt; account_name,
+                                                          :access_key =&gt; access_key)
+
+        # excepts that the metadata for the queue changes this method behaves as PUT
+        # remarks: it performs a validation whether metadata changed or not (HTTP 409 conflict)
+        queue = WAZ::Queues::Queue.create('my-queue')
+
+        10.times do |m|
+          # enqueue a receives string. Message content can be anything up to 8KB
+          # you can serialize and send anything that serializes to UTF-8 string (JSON, XML, etc)
+          queue.enqueue!("message##{m}")
+        end
+
+        while(queue.size &gt; 0) do
+          # Since WAZ implements the peek lock pattern we are locking messages (not dequeuing)
+          # it has two parameters how many messages and for how long they are locked
+          messages = queue.lock(10)
+
+          puts "dequeued message: #{messages.size}"
+
+          # deletes the message from the queue so other clients do not pick it after
+          # visibility time out expires
+          messages.each {|m| m.destroy!}
+        end</pre>
+<h2>What's next</h2>
+While doing this I figured out that there's a common behavior shared across blobs and queues, you can see it on the code that I started doing some merging while creating a ruby module called <strong>WAZ::Storage::SharedKeyCoreService</strong> that handles everything related to connections, requests, headers and signing messages. I'll be merging the whole thing into 'waz-storage' gem that I'm planning to start over the weekend and create a small reference application to illustrate better what does this do? (if you wanna join ping me via <a href="http://twitter.com/johnnyhalife">twitter @johnnnyhalife</a>)
+
+That's it, I won't say I'll do tables API too, I guess that after this week you can figure it out by yourselves (although it might take more time)
+<h3>Special Thanks</h3>
+I'd like to thank the following people that help me with something more important and painful than designing the API or writing the code that this time was an individual experiment. The following people are listening to me in every spare time I have at work, talking about why I design something like I did, how cool it is, or how do I enjoy this, which can be even hard than putting this code together!
+
+These people are: <a href="http://blogs.southworks.net/mwoloski">Matias Woloski</a>, <a href="http://blogs.southworks.net/ejadib">Ezequiel Jadib</a>, <a href="http://blogs.southworks.net/fboerr">Federico Boerr</a>, <a href="http://twitter.com/ezequielm">Ezequiel Morito</a>, <a href="http://twitter.com/srenzi">Sebastian Renzi</a>, <a href="http://blog.salias.com.ar">Martín Salias</a> and Pablo Costantini.
+
+That's all folks. Thanks,
+~johnny

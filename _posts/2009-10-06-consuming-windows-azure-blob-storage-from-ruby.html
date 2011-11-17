@@ -1,0 +1,64 @@
+--- 
+layout: post
+title: Consuming Windows Azure Blob Storage from Ruby
+published: true
+meta: 
+  _edit_last: "42"
+  _edit_lock: "1255242575"
+tags: []
+
+type: post
+status: publish
+---
+Hey Folks, today I'm proud to announce my first release of the <strong>waz-blobs</strong> <strong><a href="http://docs.rubygems.org/read/book/3">ruby gem</a></strong>, for interacting with <strong><a href="http://www.microsoft.com/azure/windowsazure.mspx">Windows Azure Blob Storage</a></strong><strong> </strong>from Ruby programming language.
+
+Yes, it's 100% organic Ruby code, there's no strange Microsoft library that you need to consume and even better it was written and tested on Mac OS X and Ubuntu 8.10.  This post is about the motivation, and design process I've taken. Here you will find a minimal reference to the code, if you're looking for the bits go straight to <a href="http://github.com/johnnyhalife/waz-blobs/">http://github.com/johnnyhalife/waz-blobs/</a> that includes the whole API documentation.
+<h2>Motivation</h2>
+Interoperability, fun and inspiration! Those three words are the base of this whole experience, from those OSS Fan thinking <em>"why would I go for Windows Azure Storage? I've have my App written 100% ruby and runs on my custom built linux distro!"</em>, here is the summary of the thinking I've been doing when I was trying to understand whether to write the API or not:
+<ul>
+	<li><strong>It's solid. </strong>Although it's on CTP, it has been out for almost a year and during the different version it has demonstrated some basic fundamentals covered on <em>Distributed Storage</em> and the speed it's really good.</li>
+</ul>
+<ul>
+	<li><strong>Ruby's alternatives for serving static files isn't great.</strong> I love Ruby, it has slowly became the language of my preference on the last year, but we have to admit that serving static files it's better when outside our Ruby App server.</li>
+</ul>
+<ul>
+	<li><strong>It's interoperable. </strong>As I started this post, the code available at <a href="http://github.com/johnnyhalife/waz-blobs/">http://github.com/johnnyhalife/waz-blobs/</a> is <strong>100% organic ruby code</strong>, it's <strong>based on the RestClient API written by Addam Wiggins</strong> from <a href="http://heroku.com">Heroku</a> that can be found on <a href="http://github.com/adamwiggins/rest-client">http://github.com/adamwiggins/rest-client</a>/. The code is based on the WAZ Rest API available at <a href="http://msdn.microsoft.com/en-us/library/dd135733.aspx">http://msdn.microsoft.com/en-us/library/dd135733.aspx</a></li>
+</ul>
+<ul>
+	<li><strong>It works great from Heroku. </strong>I spend my spare time hacking on pure Ruby and most of my project end up on <strong>Heroku (by far the best Ruby Hosting Platform on the Clouds).</strong> As you can see on<strong> <a href="http://docs.heroku.com">Heroku Docs</a></strong><strong>, </strong>their recommendation is to go for AWS-S3, and I don't like when my choices are limited, I wrote the gem just to have an alternative for S3 when hosting on Heroku.</li>
+</ul>
+<div>I loved the experience, and I'm loving each moment I spend hacking on this code, it's probably one of the most fun projects I've ever faced. As a .NET Developer, I figured out that even the Storage Client shipped with Azure SDK isn't great (it's not even fully implemented agains the API Spec), so instead of complaining I developed my own.</div>
+<br>
+<div>As summary: I did it<strong> for fun,</strong> I did it because<strong> I like having choices</strong> <strong>(not only S3)</strong> and because <strong>I wanted to see how real is Microsoft statement about interoperability for WAZ Services, </strong>which end up being completely true this time.</div>
+<br>
+<h2>Getting started with the <em>waz-blobs</em> API</h2>
+First of all, if you just want to use it just get it from the gems repository like the following:
+<pre style="font-size: 16px;padding: 2px;color: #333">gem install waz-blobs --source http://gemcutter.org</pre>
+And here's some basics
+<pre style="font-size: 12px;padding: 2px;color: #333;border: 1px solid">
+  require 'waz-blobs'
+  
+  # Save your configuration info
+  WAZ::Blobs::Base.establish_connection!(:account_name =&gt; "name", :account_key =&gt; "key")
+  
+  # creates a container
+  container = WAZ::Blobs::Container.create('my-container')
+
+  # stores a blob with custom properties (metadata)
+  blob = container.store('my-blob.txt',  'this is the content of my blob', 'plain/text')
+
+  # return a specific blob from a container
+  blob = container['my-blob.txt']
+
+  # retrieves a blob value
+  blob.value
+</pre>
+The complete API reference and source code can be found at <a href="http://github.com/johnnyhalife/waz-blobs/">http://github.com/johnnyhalife/waz-blobs/</a>, feel free to download, fork it, and submit patches.
+<br>
+<h2>Next Steps</h2>
+During the next days, I'll continue using this and probably refactoring or bug fixing. In the near future (don't know how quick yet), I'll get the WAZ Queues API too. 
+<br>
+While I work on Queues,  <strong>fork me</strong> on GitHub and consider yourself invited to submit as many patches as you want.
+<br>
+thanks and read you soon,
+~johnny 

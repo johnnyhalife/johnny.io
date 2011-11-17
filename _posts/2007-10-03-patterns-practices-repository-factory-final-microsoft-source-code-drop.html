@@ -1,0 +1,16 @@
+--- 
+layout: post
+title: Patterns & Practices Repository Factory - Final Microsoft Source Code Drop
+published: true
+meta: {}
+
+tags: 
+- Architecture
+- Guidance
+- Patterns &amp; Practices
+- Repository Factory
+- solution architecture
+type: post
+status: publish
+---
+<p align="left">We've finally released the Patterns &amp; Practices Repository Factory. This release contains the source code at the completion of the patterns &amp; practices work on this project. As we said before now the destiny it's on your hands.</p>  <p>The work done includes:</p>  <ul>   <li>Independent of Service Factory tree </li>    <li>Generic code has been moved into a separate assembly instead of being generated every time </li>    <li>Generated code has been placed in different folders to keep the underlying goop out of the way </li>    <li>Interfaces are generated for the repositories, so you can provide multiple implementations of the repository </li>    <li>Auto-mapping of entity fields and stored proc parameters </li>    <li>Recipe inputs are stored across runs so you don't have to reenter everything every time you run </li>    <li>New, easier to use and understand UI screens </li> </ul>  <br />and many other additions...   <h6>Requirements </h6> To compile this package, you need:   <ul>   <li>Visual Studio 2005 </li>    <li><a href="http://msdn2.microsoft.com/en-us/teamsystem/aa718948.aspx">GAT and GAX July 2007 CTP</a> </li> </ul>  <p align="left">   <br />The package will also compile and run with the earlier GAX Feburary 2007 CTP.</p>  <p align="left">If you wish to compile and run the unit test projects, you'll need Visual Studio Team Test, Team Developer, or Team Suite editions. </p>  <h6>Compilation and installation </h6>  <p>Open the DataAccess Guidance Package.sln file and compile.    <br />The easiest way to install the package is to compile the setup project and run the resulting MSI. The guidance package requires a registry key in order to find various support DLL's needed at runtime. The MSI will create this key for you.</p>  <p>If you wish to manually register and use the guidance package, this registry key is:</p>  <p>HKEY_LOCAL_MACHINE\Software\Microsoft\patterns &amp; practices\Repository Factory</p>  <p>Create a string value named &quot;EntlibBinaryPath&quot; and point it at a directory that contains the following DLLs:</p>  <ul>   <li>Microsoft.Practices.EnterpriseLibrary.Common.dll (available in Entlib 3.1 and included in the Lib folder in the drop) </li>    <li>Microsoft.Practices.EnterpriseLibrary.Data.dll (available in Entlib 3.1 and included in the Lib folder in the drop) </li>    <li>Microsoft.Practices.ObjectBuilder.dll (available in Entlib 3.1 and included in the Lib folder in the drop) </li>    <li>Microsoft.Practices.RecipeFramework.Extensions.dll (Included in the Lib folder in the drop) </li>    <li>Microsoft.Practices.Repository.dll (compile from source) </li>    <li>Microsoft.Practices.RepositoryFactory.SchemaDiscovery.dll (compile from source) </li>    <li>     <div align="left">You can get both (supported release code and/or Msi) go to: <a href="http://www.codeplex.com/RepositoryFactory/Release/ProjectReleases.aspx?ReleaseId=7429">http://www.codeplex.com/RepositoryFactory/Release/ProjectReleases.aspx?ReleaseId=7429</a></div>   </li> </ul>  <p>thanks,    <br />~johnny</p>

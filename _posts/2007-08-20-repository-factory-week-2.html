@@ -1,0 +1,89 @@
+--- 
+layout: post
+title: "Repository Factory - Week #2"
+published: true
+meta: {}
+
+tags: 
+- Architecture
+- cool stuff
+- Patterns &amp; Practices
+- Repository Factory
+type: post
+status: publish
+---
+
+        <p>Another report of Repository Factory from the trenches. Now we've completed the week of work. In addition to <a href="http://staff.southworks.net/blogs/johnny/archive/2007/08/13/Repository-Factory-_2D00_-Week_2300_1.aspx" target="_blank">what we've done last week</a> this is the report of the stuff completed during this second week.</p> <p>As I  told you on previous posts this project is community oriented, you can decide what we should do during next week. How? Enter <a href="http://www.codeplex.com/RepositoryFactory" target="_blank">our community site</a> and keep voting for your favorite issues.</p> <h3>Repository Class improvements</h3> <p>Our previously generated repository used to have the databaseName field on its declaration, that field is no needed since it's declared on base class (Repository). In addition we've updated the Repository class to allow you instantiate a repository using the default database declared on the config file.</p> <div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace"><span style="color: #0000ff">public</span> <span style="color: #0000ff">class</span> PersonRepository : Repository, IPersonRepository
+{
+    <span style="color: #008000">// This field has been removed.</span>
+    <strike><span style="color: #0000ff">private</span> <span style="color: #0000ff">string</span> databaseName;</strike>
+
+    <span style="color: #0000ff">public</span> PersonRepository(<span style="color: #0000ff">string</span> databaseName) : <span style="color: #0000ff">base</span>(databaseName) {}
+
+    <span style="color: #008000">// Added c'tor overload that allows you the usage of defaultDatabase</span>
+    <span style="color: #008000">// declaration used by Enterprise Library DAAB.</span>
+    <span style="color: #0000ff">public</span> PersonRepository() : <span style="color: #0000ff">base</span>() {}
+}</pre></div>
+<p>Enterprise Library default database configuration, it's done by adding this line to your config file.</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace"><span style="color: #0000ff">&lt;</span><span style="color: #800000">dataConfiguration</span> <span style="color: #ff0000">defaultDatabase</span><span style="color: #0000ff">="myConnectionString"</span> <span style="color: #0000ff">/&gt;</span></pre></div>
+<p>In addition to the changes done to the Repository class and T4 template, we've modified the RepositoryFactory class allowing you to instantiate a repository without connection name.</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace"><span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">class</span> RepositoryFactory
+{
+    <span style="color: #008000">// These are the added overloads that allows you </span>
+    <span style="color: #008000">// the instantiation of the repository class without </span>
+    <span style="color: #008000">// passing the connection string name.   </span>
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> T Create();
+
+    <span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">object</span> Create(Type repositoryInterface);
+}</pre></div>
+<p>Combining that configuration line and the improvements done this week, now you're allowed to use the RepositoryFactory in this way</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace"><span style="color: #0000ff">public</span> <span style="color: #0000ff">static</span> <span style="color: #0000ff">void</span> Main(<span style="color: #0000ff">string</span>[] args)
+{
+    IPersonRepository repository =
+                        RepositoryFactory.Create();
+}</pre></div>
+<h3>Configuration issue fixed</h3>
+<p>We've modified the way the recipe edits the configuration file and appends the repository mapping information. More information can be found in the following snippet I took out from the code.</p>
+<p><strong>[FILE: SetRepositoryMappingAction.cs]</strong></p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace"><span style="color: #0000ff">public</span> <span style="color: #0000ff">override</span> <span style="color: #0000ff">void</span> Execute()
+{
+    <span style="color: #008000">// We're using XML in this action because there's a </span>
+    <span style="color: #008000">// dll issue with Guidance Package and the target project.</span>
+    <span style="color: #008000">// They're referencing the same assembly but in different</span>
+    <span style="color: #008000">// locations and that generates that runtime errors.</span>
+    XmlDocument document = <span style="color: #0000ff">new</span> XmlDocument();
+    document.Load(configuration.FilePath);
+    EnsureConfigurationSectionDeclarationExists(<span style="color: #006080">"repositoryFactory"</span>, 
+                                       Resources.RepositoryFactorySectionDeclaration);
+
+    XmlNode repositoryFactorySection = GetOrCreateConfigurationSection
+                                                            (<span style="color: #006080">"repositoryFactory"</span>);
+
+    AddRepositoryMappings(repositoryFactorySection, document);
+
+    document.Save(configuration.FilePath);
+}</pre></div>
+<h3>Create Repository wizard reentrancy</h3>
+<p>One of the most voted issues on our <a href="http://www.codeplex.com/RepositoryFactory" target="_blank">community site</a> was giving the <em>"Create repository recipe"</em>  the ability to store the operations and mappings selected the last time you've used it to create a repository for a given entity. I'll show this new improvement with a sample.</p>
+<h4><em>The wizard page</em></h4>
+<p><a title="wizardPage" href="http://www.flickr.com/photos/67651183@N00/1174370262/"><img alt="wizardPage" src="http://static.flickr.com/1054/1174370262_f19301dd03.jpg" border="0"></a></p>
+<p>On this page you've to specify the operations you want to generate in your repository class, the improvement we've done allows you to store this information as metadata on a <em><strong>rcpState </strong></em>file.</p>
+<h4><em>The generated recipe state file</em></h4>
+<p>The <em>recipe state file</em> is an Xml file that stores the information of the operations you've chosen to generate the repository. The structure is depicted on the snippet bellow</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace"><span style="color: #0000ff">&lt;</span><span style="color: #800000">repositoryInformation</span><span style="color: #0000ff">&gt;</span>
+    <span style="color: #0000ff">&lt;</span><span style="color: #800000">repositoryMetadata</span> <span style="color: #ff0000">name</span><span style="color: #0000ff">="Person"</span><span style="color: #0000ff">&gt;</span>
+        <span style="color: #0000ff">&lt;</span><span style="color: #800000">operation</span> <span style="color: #ff0000">operationName</span><span style="color: #0000ff">="DeletePerson"</span>
+                   <span style="color: #ff0000">hasInputParameters</span><span style="color: #0000ff">="True"</span>
+                   <span style="color: #ff0000">procedure</span><span style="color: #0000ff">="DeletePerson"</span>
+                   <span style="color: #ff0000">operationType</span><span style="color: #0000ff">="DeleteOne"</span> <span style="color: #0000ff">/&gt;</span>
+    <span style="color: #0000ff">&lt;/</span><span style="color: #800000">repositoryMetadata</span><span style="color: #0000ff">&gt;</span>
+<span style="color: #0000ff">&lt;/</span><span style="color: #800000">repositoryInformation</span><span style="color: #0000ff">&gt;</span></pre></div>
+<p>Finally the Xml is stored on the <strong><em>solution folder</em></strong>, with the <strong><em>solution name </em></strong>and <em><strong>rcpstate</strong></em> extension.</p>
+<h4><a title="rcpStateFS" href="http://www.flickr.com/photos/67651183@N00/1174369896/"><img alt="rcpStateFS" src="http://static.flickr.com/1180/1174369896_e52c647c0b.jpg" border="0"></a></h4>
+<h3>Documentation</h3>
+<p>We have added the ///XMLDoc to all of the types existing on the <strong><em>Microsoft.Practices.Repository.</em></strong></p>
+<h3>Summary</h3>
+<p>We finished another week, all the tackled issues were not invented by us, they are community requests. We're listening to you, please feel free to provide feedback in our <a href="http://www.codeplex.com/RepositoryFactory">community site</a>. We work on the improvements starting with highly ranked ones, you have a chance to influence the course of the project.
+<p>Also we've dropped our first CTP that you can find as <a href="http://www.codeplex.com/RepositoryFactory/Release/ProjectReleases.aspx?ReleaseId=6463" target="_blank">source code release here</a>.
+<p>thanks,<br>~johnny</p>
+      

@@ -1,0 +1,51 @@
+--- 
+layout: post
+title: "Dynamic Languages\xE2\x80\xA6 a software odyssey or just another buzz"
+published: true
+meta: 
+  _edit_last: "42"
+  _edit_lock: "1216674050"
+tags: 
+- clr
+- dlr
+- dynamic languages
+type: post
+status: publish
+---
+During Tech Ed 08’ I’ve chance to attend the <strong><em>Dynamic Languages - Births of the Feather</em></strong> session, I’m a big C# and I thought at that point that nothing can make me change C#, because it’s elegant, has language features that I love (interfaces and attributes) but I figured out that is something else under the sun.
+
+Compiled languages has been working for a while, but as every compiled piece it’s targeted to run on a specific platform, there were some intents to get the applications to be built to an intermediate language to allow portability at some point in time. People may often think that this came for free, nobody could be faster than our beloved C/C++, but in terms of tradeoffs if you guarantee me portability I’ll definitely buy in.  Doing a quick recap over these ideas, is there anything wrong with this? Why I’m looking at DLR or dynamic stuff that was out there for a while? Let’s consider PHP which is the most leveraged language in terms of web applications. Why now?
+
+I see static compiled languages as an assumption that your world is static, your business problems can be classified and everything is already defined. Software + Services, DSL and other new trends are claiming for flexibility, customization and extension. This means that static world was nice for a while and might be useful in tons of cases but now it’s time to talk about our new old friends the dynamic languages.
+<h4>What’s a dynamic language?</h4>
+Dynamic language is a term used to describe a class of high level programming languages that execute at runtime many common behaviors that other languages might perform during compilation, if at all. These behaviors could include extension of the program, by adding new code, by extending objects and definitions, or by modifying the type system, all during program execution. These behaviors can be emulated in nearly any language of sufficient complexity, but dynamic languages provide direct tools to make use of them.
+<h4>Why dynamic languages?</h4>
+That’s a complicated political question, as I introduced this post, my personal opinion is that world is moving fast, people need software, developers need to be productive and software needs to be prepared for runtime changing, and mutation. Some computer science orthodox, friend of C++ or C# fan might be thinking about it as “<em>you young padwan just want to crack code and get ready to enjoy your star trek episode”. </em>That’s is fairly true,  but there’s true in something like “<em>I want to write code that runs on my mac, can be developed on Windows using my Visual Studio and hosted on openSuse”</em> , seems as an ambitious desire, but it’s how the world is behaving right now.
+
+Will this be the end of C# and our beloved friend C++?, absolutely not I think that this is a top level mind change, we need C# as much as we need C++ and static languages for some aspects of our product that won’t mutate over time. We want dynamic languages to be the top of the stack, write the business logic, UI and process that might change, where its involved pieces might mutate.
+
+We (developers) want to ship software fast, we want to be ready for changes, but we won’t forsake our lessons learnt as TDD. So the answer might be let’s getting started with something that evolves as your product evolves, and have a coding fun.
+<h4>What’s the DLR and why I love it?</h4>
+From the beginning, Microsoft's .NET framework was designed to support a broad range of different programming languages on a Common Language Runtime (CLR).  The CLR provides shared services to these languages ranging from a world-class Garbage Collector and JIT to a sandboxed security model to tools integration for debugging and profiling.  Sharing these features has two huge benefits for languages on the CLR.  First, it's easier to implement a language because lots of difficult engineering work is already done for you.  Second, and more importantly, these languages can seamlessly work together and share libraries and frameworks so that each language can build on the work of the others.
+
+DLR (Dynamic Language Runtime) is layer over the CLR that let dynamic languages share the robust platform under hood for .Net Languages from dynamic lanaguages (like Iron Python, Iron Ruby,  Managed Javascript) that will let the developers to have a world class execution environment without leaving the CLR.
+
+<a href="http://blogs.southworks.net/jhalife/files/2008/07/clip-image002.gif"><img src="http://blogs.southworks.net/jhalife/files/2008/07/clip-image002-thumb.gif" border="0" alt="clip_image002" width="469" height="188" /></a>
+
+Is this it? Not really, DLR also is for dynamic languages what CLR is for static compiled ones, it’s a platform that can be leveraged to write your own language.
+
+<strong>Why I love the DLR?</strong> It’s an easy question; DLR let me use dynamic languages with runtime language services of the world-class static language. In this way I can get my code fast and productively written on a dynamic language but running with the shields and lessons learnt used for static languages.
+<h4>Why  IronRuby?</h4>
+<ul>
+	<li>IronRuby is ruby for .net. I love ruby :)</li>
+	<li>Ruby syntax is one of the most productive, human readable syntax I’ve ever seen.</li>
+	<li>Has an almost 100% compatibility with C-Pure Ruby implementation (used in Mac, Linux and windows too).</li>
+	<li>Tool set, allows me to do all the stuff I learnt like TDD.</li>
+</ul>
+<h4>Conclusions</h4>
+Dynamic Languages are back or never left, but my point is that we like them and since we have capabilities like the one provided by the CLR, we are now ready to start writing some dynamic language based application. I love it, but it’s not always one size fits all, I think we still need to think if our app is the case for a dynamic language.
+
+Stay tuned, I’ll be posting more on this, like: TDD and IronRuby, using rake, consuming .net assemblies from it and much more.
+
+thanks,
+~johnny

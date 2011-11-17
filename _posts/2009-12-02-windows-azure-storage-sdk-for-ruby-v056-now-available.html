@@ -1,0 +1,50 @@
+--- 
+layout: post
+title: Windows Azure Storage SDK for Ruby v0.5.6 now available!
+published: true
+meta: 
+  _edit_last: "42"
+  _edit_lock: "1287036498"
+tags: 
+- Emerging Technology
+type: post
+status: publish
+---
+<p>Hey Folks, after PDC 09' I'm back on track doing some work on the Windows Azure Storage SDK for Ruby. <a href="http://blogs.southworks.net/jhalife/2009/11/23/windows-azure-storage-sdk-for-ruby-on-channel9/">On my Channel9 interview</a>, I told you that Ray Ozzie announced<a href="http://msdn.microsoft.com/en-us/library/dd894041.aspx"> a new version of Windows Azure Storage API (a.k.a 2009-09-19)</a> which enables developers to perform new tasks on the storage components</p>
+
+<p>These are the enhancements for the<strong> 0.5.6 version of the SDK,</strong> <strong>this release only covers the Windows Azure Queues Service 2009-09-19 version</strong>, <strong>Blobs support will be released end of this week or early next week.</strong></p>
+<h2>What's new on the 0.5.6 version?</h2>
+<ul>
+	<li>Added new<span class="Apple-converted-space"> </span><strong>shared key authentication support for 2009-09-19 Version of the Storage API</strong></li>
+	<li>Queues API has been migrated to the<span class="Apple-converted-space"> </span><strong>2009-09-19 Version of the Storage API</strong></li>
+	<li>Added a new parameter for<span class="Apple-converted-space"> </span><strong>Listing Queues with Metadata</strong></li>
+	<li>Added support for<span class="Apple-converted-space"> </span><strong>DequeueCount</strong><span class="Apple-converted-space"> </span>on messages being retrieved from the Queue</li>
+	<li><strong>Known Issue</strong>: Creating a queue multiple times with same metadata throws 409.</li>
+</ul>
+<br/>
+<h3>Using the latest version of the Windows Azure Storage SDK for <em>Poison Message detection</em></h3>
+<pre style="font-size: 12px">  WAZ::Storage::Base.establish_connection!(:account_name =&gt; 'name', :access_key =&gt; 'key')
+
+  # Let's start by selecting a queue
+  queue = WAZ::Queues::Queue.find('my-queue')
+
+  # While the queue has messages, let's check the content
+  while (queue.size &gt; 0) do
+    # Now let's dequeue a message as we usually do we the API
+    message = queue.lock
+
+    # Before processing the message we can now do a sanity check for the message
+    # if the message has been dequeued more than 5 times we will destroy it since
+    # it can be a <em>poison message</em>.
+    if (message.<strong>dequeue_count</strong> &gt; 5)
+        message.destroy!
+    else
+        # We process the message as we usually do
+    end
+  end</pre>
+<p>The <strong>key feature on this version of the API is the dequeue_count </strong>property for Queues which serves the primary goal, as shown sample above, of <em>Poison Message</em> detection.</p>
+
+<p>Stay tuned for further updates on the SDK...</p>
+
+<p>thanks, <br />
+~johnny</p>

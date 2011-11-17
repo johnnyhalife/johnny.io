@@ -1,0 +1,36 @@
+--- 
+layout: post
+title: Issues running Windows Azure SDK (Ruby/C#) from Local Time when GMT -3 change didn't happen
+published: true
+meta: 
+  _edit_last: "42"
+  _edit_lock: "1255973162"
+tags: []
+
+type: post
+status: publish
+---
+<p>I was working on the Ruby Windows Azure SDK and I started receiving HTTP/1.1 403 errors, I figured out which is the problem so here you can get a simple issue analysis</p>
+
+<h3>Symptom</h3>
+<p>While trying to connect to Windows Azure (Storage at least) from Argentina, you get 403 errors even dough the message seems to be formatted correctly.</p>
+
+<h3>Issue</h3>
+<p>Argentina was supposed to change the time by adjusting it to DTS (Daylight Time Saving), one day before that happens the Argentinean Government decided not to make that change, generating a lots of implications for computer systems adjusted to DTS. </p>
+
+<p>Since Windows Azure relays on UTC Timestamp for making an assertion on the signature, the current time for GMT -3 isn't what is expected from the server side causing the whole message to fail after the an assertion of the signature.</p>
+
+<h3>Workaround</h3>
+<p>There's no apparent solution yet, but there are a couple of workarounds in order to properly develop against Windows Azure from a not changed GMT -3 time zone.</p>
+<ul>
+	<li><strong>Change your time zone to GMT -4</strong>. I switched my computer back to Halifax - Canada that has GMT -4 for an Windows Azure started accepting my requests 
+</li>
+	<li><strong> Keep your computer with the clock one hour ahead </strong>. Keep the current time zone without tweaking the Date/Time, but remember that you will be out of sync with the country</li>
+</ul>
+<br />
+<p>Both of the workarounds listed above proved to be successfully working, I will stick with GMT -4 since I guide myself (eating, sleeping, and all that) in my computer clock.</p>
+
+<p>Hope it helps,<br />
+~johnny</p>
+
+

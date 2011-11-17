@@ -1,0 +1,134 @@
+--- 
+layout: post
+title: "self rebase #01"
+published: true
+meta: 
+  _edit_last: "42"
+  _edit_lock: "1287036469"
+tags: 
+- Emerging Technology
+type: post
+status: publish
+---
+<p>Taken from the <a href="http://mirror.averse.net/pub/software/scm/git/docs/v1.6.0.6/git-rebase.html">rebase concept of git</a> which is also used by <a href="http://github.com/blog/593-github-rebase-35">GitHub</a> to show they newsworthy and notable projects, I’m using the post to do the same with bunch of Open Source, shared, hacking projects I’ll be doing lately.</p>
+
+<p>Since 2010 started, I didn’t blogged that often, but there were a couple of projects that I’ve been working lately. Throughout this post, I’ll describe each one and the futures.</p>
+
+<p>Every piece of feedback will be welcome, as every other contribution too.</p>
+
+<p>Enjoy the ride,<br />
+~johnny</p>
+
+<h3>Rack::Auth::WRAP, the OAuth WRAP Middleware</h3>
+<p>Yesterday, with <a href="http://twitter.com/jpgd">Juan Pablo</a>, we published our first version of <strong>Rack::Auth::WRAP</strong> the first version of the <a href="http://rack.rubyforge.org/">Rack</a>. If you are familiar with the protocol, you can skip the next section if not, take a look at it. Extracted from the read me at <a href="http://github.com/johnnyhalife/rack-oauth-wrap">github.com</a>.</p>
+
+<h4>What the heck is WRAP?</h4>
+<p>Web Resource Authorization Protocol (WRAP) is a profile of OAuth, also called OAuth WRAP. While similar in pattern to OAuth 1.0A, the WRAP profile(s) have a number of important capabilities that were not available previously in OAuth. This specification is being contributed to the IETF OAuth WG.</p>
+<p>Also this same group owns the specification for the SWT (Simple-Web-Token), for more information read <a href="wiki.oauth.net/OAuth-WRAP">wiki.oauth.net/OAuth-WRAP</a> or visit the <a href="groups.google.com/group/oauth-wrap-wg">groups.google.com/group/oauth-wrap-wg</a>.</p>
+<p>The latest specification for the complete protocol can be found at Google Group as HTML (RFC properly formatted) on <a href="groups.google.com/group/oauth-wrap-wg/attach/981df73f2839b8ef/draft-hardt-oauth-wrap-01.html?part=5">groups.google.com/group/oauth-wrap-wg/attach/981df73f2839b8ef/draft-hardt-oauth-wrap-01.html?part=5</a></p>
+
+<h4>Creating your first protected resource</h4>
+<p>As you might be thinking, our first resource will be a <a href="www.sinatrarb.com">Sinatra</a> application.</p>
+
+<p>First of all we need to install the gem, as</p>
+<pre style="border:solid 1px #cccbba;font:normal normal normal 12px LuxiMono,'Bitstream Vera Sans Mono',Monaco,'Courier New',monospace;color:#1c360c">[sudo] gem install rack-oauth-wrap</pre>
+<p>To make the sample easier let’s create our own shared key, we can all share this for demo purpose <br/> <strong>NjkzNTczOTAtMDA2MC0wMTJkLTQ1M2YtMDAyMzMyYjFmYWY4\n</strong></p>
+
+<p>So let’s start by creating the protected resource</p>
+<pre style="border:solid 1px #cccbba;font:normal normal normal 12px LuxiMono,'Bitstream Vera Sans Mono',Monaco,'Courier New',monospace;color:#1c360c;width: 660px;padding: 5px">require 'rubygems'
+require 'sinatra'
+require 'rack/auth/wrap'
+
+use Rack::Auth::WRAP, :shared_secret =&gt;t; "NjkzNTczOTAtMDA2MC0wMTJkLTQ1M2YtMDAyMzMyYjFmYWY4",
+                      :audiences =&gt;; "http://localhost:4567",
+                      :trusted_issuers =&gt;; "urn:demo-issuer"
+
+get "/" do
+    if @env["REMOTE_USER"]
+        return "You are authenticated as #{@env["REMOTE_USER"]['Email']}"
+    else
+        return "You are an unauthenticated user"
+    end
+end</pre>
+
+<p>Now we can start this on a Terminal (cmd, or whatever) and let’s jump to the consumer, but first if you try it without sending a token, and using the client we are going to build, you will get:</p>
+<pre style="border:solid 1px #cccbba;font:normal normal normal 12px LuxiMono,'Bitstream Vera Sans Mono',Monaco,'Courier New',monospace;color:#1c360c">?&gt; curl http://localhost:45678
+You are unauthenticated</pre>
+<p>Now lets create a client trying to access a protected resource with a token on the header (requires <a href="http://rest-client.heroku.com">restclient</a>)</p>
+<pre style="border:solid 1px #cccbba;font:normal normal normal 12px LuxiMono,'Bitstream Vera Sans Mono',Monaco,'Courier New',monospace;color:#1c360c;width: 900px;padding: 5px">require 'rubygems'
+require 'cgi'
+require 'base64'
+require 'restclient'
+require 'hmac/sha2'
+
+SHARED_SECRET = "NjkzNTczOTAtMDA2MC0wMTJkLTQ1M2YtMDAyMzMyYjFmYWY4\n"
+
+simple_web_token = {'Audience' =&gt;; "http://localhost:4567",
+                    'Issuer' =&gt;; "urn:demo-issuer",
+                    'ExpiresOn' =&gt;; (Time.now.to_i + 60).to_s,
+                    'Email' =&gt;; 'johnny.halife@sample.com'}.map{|k, v| "#{k}=#{CGI.escape(v)}"}.join("&amp;")
+
+signature = Base64.encode64(HMAC::SHA256.new(Base64.decode64(SHARED_SECRET)).update(simple_web_token.toutf8).digest).strip
+simple_web_token += "&amp;HMACSHA256=#{CGI.escape(signature)}"
+
+puts RestClient.get("http://localhost:4567/", "Authorization" =&gt;; "WRAP access_token=#{CGI.escape(simple_web_token)}")</pre>
+<p>Now let’s try our client, and see if there’s any difference with the <em>curl</em> request:</p>
+<pre style="border:solid 1px #cccbba;font:normal normal normal 12px LuxiMono,'Bitstream Vera Sans Mono',Monaco,'Courier New',monospace;color:#1c360c">?&gt; ruby client.rb
+You are authenticated as johnny.halife@sample.com</pre>
+<p>As you can see, we have our first end to end, Rack::Auth::WRAP Sample.</p>
+<p><strong>DISCLAIMER: On a real world application you won’t generate your own token as we are doing on the client code. We are doing it for demo purposed, but probably on you app you will get a token from an authorization server. </strong></p>
+<p>Both snippets are available as gits on github: <a href="http://gist.github.com/309717">Protected Resource</a> / <a href="http://gist.github.com/309732">Client</a>. We are assuming that this is running on localhost:4567</p>
+
+<h4>TODO’s and futures</h4>
+<p>On the upcoming days/weeks/months we are going to get on the middleware support for the other ways of getting the token, like Query String and/or method body. Also we would like to implement the <em>Web Profile</em> of WRAP, so stay tuned.</p>
+<p>You can read the freshly published documentation at <a href="http://rack-oauth-wrap.heroku.com">http://rack-oauth-wrap.heroku.com</a></p>
+<p><strong>Source Code available at</strong>:  <a href="http://github.com/johnnyhalife/rack-oauth-wrap">http://github.com/johnnyhalife/rack-oauth-wrap</a></p>
+
+<h3>OAuth WRAP 0.9 for Tcl</h3>
+<p>First of all, if you aren’t familiar with Tcl it’s “originally from “Tool Command Language”, but conventionally rendered as Tcl is a scripting language created by John Ousterhout”. I encourage you to test it and also if you are interested read <a href="http://blogs.activestate.com/2010/02/where-is-tcl-hiding/">Where’s Tcl hiding?</a>.
+
+<p>This project was born after half an hour spiking on how hard it will be to parse a token on a bare linux distro that only has Tcl. After we noticed that Tcl is really straightforward language for design, prototype and is fun to write, we packed this lib and make it available for anyone interested.</p>
+
+<p>Here’s an snippet of the intended usage of the lib</p>
+<pre style="border:solid 1px #cccbba;font:normal normal normal 12px LuxiMono,'Bitstream Vera Sans Mono',Monaco,'Courier New',monospace;color:#1c360c;width: 675px;padding: 5px">package require ::oauth::wrap
+
+set rawToken "access_token=something&amp;other_parameters_to_ignore" #=&gt; the token from the IP
+
+# =&gt; creates a configuration dictionary for the values
+dict set configuration signingKey {valid_key} # =&gt; signing key used by the Identity Provider
+dict set configuration issuer {valid_issuer} # =&gt; the identity provider URI
+dict set configuration audience {valid_audience}  # =&gt; my application audience URI
+
+# this will return the token when it's valid else it will return false
+set token [oauth::wrap::authenticate $configuration $rawToken]
+
+# at this point if the token valid you can mess around with its claims
+# that are returned on a dictionary form
+set name [dict get $token name]</pre>
+<p>It’s fun to give it a shot, check out the source code at <strong><a href="http://github.com/johnnyhalife/tcl-oauth-wrap">http://github.com/johnnyhalife/tcl-oauth-wrap</a></strong></p>
+<h3>Windows Azure Storage for Ruby v1.0</h3>
+<p>On the 4th February, 2010 <strong>I’ve published the version 1.0 of ruby gem I wrote for Windows Azure Storage</strong>. This time it has the great contribution of my friend <a href="http://twitter.com/jpgd">Juan Pablo Garcia Dalolla</a> <strong>who has implemented the Windows Azure Tables support</strong>.</p>
+
+<p>This version of the gem also includes support for the version 2009-09-19.</p>
+
+<p>Here’re are some code snippets from the Windows Azure Tables support</p>
+<pre style="border:solid 1px #cccbba;font:normal normal normal 12px LuxiMono,'Bitstream Vera Sans Mono',Monaco,'Courier New',monospace;color:#1c360c;width: 800px;padding: 5px">require 'waz-storage'
+require 'waz-tables'
+
+# The same connection of Windows Azure Storage Core (Queues, Blobs) can be reused
+WAZ::Storage::Base.establish_connection!(:account_name =&gt;; account_name,
+                                         :access_key =&gt;; access_key)
+
+# Grab the service instance
+service = WAZ::Tables::Table.service_instance
+
+# Query the customer table
+service.query('customer_table', {:expression =&gt;; "(PartitionKey eq 'customer') and (Age eq 23)", :top =&gt;; 15} )
+
+# Insert something into the customer table
+serivce.query('customer_table', {:row_key =&gt;; 'my_custom_id', :name =&gt;; 'johnny'})</pre>
+<p>There’s also a DataMapper adapter effort going on for Windows Azure Storage Tables, <strong>I recommend you to check out Juan Pablo’s post about <a href="http://blogs.southworks.net/jpgarcia/2010/02/08/windows-azure-tables-adapter-for-datamapper/">Windows Azure Tables Adapter for Datamapper</a></strong></p>
+
+<p><strong>Source Code available at: <a href="http://github.com/johnnyhalife/waz-storage">http://github.com/johnnyhalife/waz-storage</a></strong></p>
+
+<p><strong>RDoc available at: <a href="http://waz-storage.heroku.com">http://github.com/johnnyhalife/waz-storage</a></strong></p>

@@ -1,0 +1,47 @@
+--- 
+layout: post
+title: waz-queues + waz-blobs = Ruby WAZ Storage SDK (waz-storage)
+published: true
+meta: 
+  _edit_last: "42"
+  _edit_lock: "1255543149"
+tags: []
+
+type: post
+status: publish
+---
+Hey, after giving lots of thoughts of what am I going to do with the whole set of Ruby APIs for Windows Azure Storage, I figured out that might be better to have them merged, tested and refactored as a whole thing. I thought about lot's of pro's and con's regarding whether to do this or not and I came out with a the following list:
+<h3>Pro's</h3>
+<ul>
+	<li>Blobs and Queues handle the same type of security, connection and headers. They share the core service called WAZ::Storage::SharedKeyCoreService</li>
+	<li>While I was doing some work on Queues I found some bugs on connection management and URI management on the CoreService, so those changes weren't propagated to Blobs (yet).</li>
+	<li>99% use case of the gem is that people handle a single WAZ Account for everything (Queues, Blobs and Tables) so have to connect, configure and consume them from different gems seems lot of overhead.</li>
+	<li>Maintainability Index really drops on having them split.</li>
+	<li>This is a single man's work and even worse is doing over my spare time (so I cannot keep them both up-to-date always).</li>
+	<li>Total gem size is 50KB compared to two gems of 30KB (so storage isn't a problem here)</li>
+</ul>
+<h3>Con's</h3>
+<ul>
+	<li>At some point seemed cool and very aligned with YAGNI that you need to install only what you need (queues or blobs)</li>
+	<li>Shared behavior could be inherited from a third gem called 'waz-storage-core' but that will require more maintainability work.</li>
+</ul>
+Those are the things that came to my mind while working on this, so I decided to glue them together, refactor them and generate a consisten API for both services (and the tables soon enough).
+<h2>Towards the SDK</h2>
+Ruby devs aren't usually required to have SDKs that's more of the Windows World. SDK is the name I decided the whole thing will have: documentation, sample, gems and source code (Yes! I'll do more docs). I'm looking for a consumable way for Ruby Devs to get involved on Windows Azure (since it's worth doing it) but also there're a lot of .NET Developers that may want to have a look at Ruby's features and opportunities outside Windows World.
+<h2>This is work in progress</h2>
+<img class="alignright" style="float: right" src="http://files.me.com/johnny.halife/nu6rch" alt="Tests running together" width="355" height="204" />
+
+Although I didn't officially released anything related to this new SDK, I started my own work towards completing the API, <strong>so every piece of valuable feedback you might have will be really appreciated!</strong> I really enjoy while doing this and probably will do better as time goes by but as you can see on the pictures, I already started, merged and have a pretty decent TODO's to apply to this thing and probably after that I'll be releasing another version.
+
+From the picture on the right you can infer, that I've already merged the test suite, and the TODO's. The whole project is now a single thing. These are the things that I'm considering for next version
+
+<img src="http://files.me.com/johnny.halife/fd3y88" alt="TODO's" width="684" height="512" />
+
+As you can see, there are things that still need to be figured out, but with time (no much) , they will emerge and I'll be releasing as soon as I have them.
+<h2>Help wanted!</h2>
+As I mentioned now and on the previous posts, <strong>this is a one man's work but you can change it =).</strong> I'm looking for Developers (juniors, amateurs, pro's, whatever) to contribute on the project as they wish. If you want to test the code base, write a sample, write some docs, or whatever you're invited! Drop me a message at <a href="http://twitter.com/johnnyhalife">@johnnyhalife</a> and we should get going soon.
+
+that's it, stay tuned for more! (very soon)
+
+thanks,
+~johnny

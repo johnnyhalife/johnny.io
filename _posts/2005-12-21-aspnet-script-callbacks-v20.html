@@ -1,0 +1,30 @@
+--- 
+layout: post
+title: ASP.NET Script Callbacks (V2.0)
+published: true
+meta: {}
+
+tags: 
+- ASP.NET 2.0
+type: post
+status: publish
+---
+
+        <P><FONT face="Tahoma" size="2">The great news about the scripting object model in ASP.NET 2.0 is that allows you to call a sever side function without redrawing whole page. Previously for the same functionallity we used some third party frameworks like AJAX.NET or implemented our own framework based on XMLHTTP Activex Object or  XMLHTTP Native Mozilla Object. Now this is a built-in functionallity. We can use these callbacks to: Refresh only a panel on page or retrive on-demand data from server. Let's take a look to see how it works.</FONT></P>
+<P><FONT face="Tahoma" size="2">A script callback begins with a client-side event that triggers WebForm_DoCallback function (ASP.NET JS Native Function). These function requiers some arguments:</FONT></P>
+<DIV>
+<P><FONT face="Courier New" color="#000000" size="2">WebForm_DoCallback( <BR>   pageID,  <FONT color="#006400">//ID of the page that makes the call<BR></FONT>   argument, <FONT color="#006400">//string argument to pass server-side code</FONT><BR>   returnCallback, <FONT color="#006400">//JavaScript function that is invoked after callback occurs</FONT><BR>   context, <FONT color="#006400">// value the caller needs to pass to return callback<BR></FONT>   errorCallback <FONT color="#006400">//Javascript function that is invoked when server side call fails</FONT><BR>)</FONT></P></DIV>
+<P><FONT face="Tahoma" size="2">Every control that wants to support out-of-band callback must implement the <EM>ICallbackEventHandler </EM>interface:</FONT></P>
+<DIV>
+<P><FONT face="Courier New" color="#000000" size="2"><FONT color="#0000ff">interface</FONT> ICallbackEventHandler<BR>{</FONT><FONT face="Courier New" color="#000000" size="2"> </FONT><FONT face="Courier New" color="#000000" size="2"><BR>    <FONT color="#0000ff">string</FONT> RaiseCallbackEvent (<FONT color="#0000ff">string</FONT> eventArgument);</FONT><FONT face="Courier New" color="#000000" size="2"><BR>)</FONT></P></DIV>
+<P><FONT face="Tahoma" size="2">The RaiseCallbackEvent should retrive server-side values based on the parameter(s) and pack everything into a return string.</FONT></P>
+<P><FONT face="Tahoma">Client-Side Postback Cycle</FONT></P>
+<P><FONT face="Tahoma" size="2">The page posts backs to the server and gets initilized as usual. The Init and Load events are fired, and the IsCallback property is set to true. RaiseCallbackEvent is invoked when loading phase is completed. After that, the request ends withouth entering the rendering phase. A client-side system component (the Callback Manager) is a script library sent to the client by ASP.NET, it's responsible for creating a request to the server, and will fire the appropiate server-side event. It also parses the response and passes the appropiate data to the specified JavaScript return Callback.</FONT></P><FONT face="Tahoma" size="2">
+<P><FONT face="Tahoma" size="3">Some notes</FONT></P>
+<P><FONT face="Tahoma" size="3"><FONT size="2">Theoe interface could be implemented by any System.Web.Control hicherarcy control.</FONT></FONT></P>
+<P><FONT face="Tahoma" size="3"><FONT size="2">Should we write the to <EM>WebForm_DoCallback </EM>your self? Should you about its details? Not neccesarily. The <EM>GetCallbackEventReference </EM>method on the <EM>Page.ClientScript  </EM>object on <EM>Page </EM>class returns the script string that starts the callback. You prefix this string with <EM>Javascript: </EM>and attach it to any action event attribute on control. (ex. htmlButton.Attributes["onclick"]).<BR></FONT></FONT></P>
+<P><FONT face="Tahoma" size="3"><FONT size="2"><STRONG>GetCallbackEventReference example</STRONG></FONT></FONT></P>
+<DIV>
+<P><FONT face="Courier New" color="#000000" size="2"><FONT color="#0000ff">protected void <FONT color="#000000">Page_</FONT><FONT color="#000000">Load(</FONT>object <FONT color="#000000">sender,</FONT> </FONT><FONT color="#9acd32">EventArgs </FONT><FONT color="#000000">e)<BR></FONT>{<BR></FONT><FONT face="Courier New" color="#000000" size="2"><FONT size="2">   htmlButton.Attributes["onclick"] = Page.ClientScript.GetCallbackEventReference(</FONT><FONT color="#0000ff" size="2">this</FONT><FONT size="2">, </FONT></FONT><FONT face="Courier New" color="#000000" size="2"><FONT color="#800000" size="2">"argument"</FONT><FONT size="2">, </FONT><FONT color="#800000" size="2">"callback"</FONT><FONT size="2">, "</FONT></FONT><FONT face="Courier New" color="#000000" size="2"><FONT color="#800000" size="2">preCallbackFunction"</FONT><FONT size="2">);</FONT></FONT><FONT face="Courier New" color="#000000" size="2"><BR>)</FONT></P>
+<P><FONT face="Courier New">//About the arguments of <EM>GetCallbackEventReference<BR>control: control that handles the client callback.<BR>argument: argument which is passed to the server-side function<BR>callback: javascript function that is triggered from a successfull client side callback.<BR>preCallbackFunction: javascript function that is evaluated on client prior server side callback.<BR></EM></FONT><FONT face="Courier New"><EM><BR></P></EM></FONT></DIV></FONT>
+      

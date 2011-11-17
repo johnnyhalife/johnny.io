@@ -1,0 +1,185 @@
+--- 
+layout: post
+title: Subversion over openSuse 10.3 using Windows Authentication
+published: true
+meta: {}
+
+tags: 
+- active directory
+- apache2
+- Architecture
+- Guidance
+- subversion
+type: post
+status: publish
+---
+
+        <p>Subversion authenticating against Windows Active Directory seems fairly complex from the perspective that there's no documentation available. The existing information relates to authenticating Apache running on Windows against Active Directory.  <p>After a couple of days nightmare/research we came up with this how-to that will provide the basis and the steps needed to authenticate against AD. We recommend you to read the "SVN Book" (<b>Version Control with Subversion</b>, Ben Collins-Sussman, Brian W. Fitzpatrick, C. Michael Pilato), to download the book go this <a href="http://svnbook.red-bean.com">website</a>.  <h3>What is Subversion?</h3> <p><a href="http://subversion.tigris.org/">Subversion</a> is a versioning system, which allows you to store a development filetree in a "repository", keeps track of edits made to the files, and allows those edits to be rolled back if necessary.  <h3>Software Installation</h3> <p>Before we begin please make sure that you've the following packages installed on your computer: <strong>apache2, apache2-prefork, apache2-doc, libapr1, libapr-util1, neon, subversion, subversion-server, subversion-docs, pam_ldap</strong>.</p> <p>Once you've the required packages installed you should be able to configure apache to load the required modules.</p> <div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">(su) a2enmod dav <span style="color: #008000">#enables DAV in apache2</span>
+(su) a2enmod dav_svn <span style="color: #008000">#enables DAV access to SVN filesystem</span>
+(su) a2enmod ldap <span style="color: #008000">#loads the base library for ldap modules</span>
+(su) a2enmod authzn_ldap <span style="color: #008000">#this is the apache 2.2.4 module for ldap authentication</span>
+(su) a2enmod authz_svn <span style="color: #008000">#enabled file-based access to svn repository</span>
+</pre></div>
+<p><strong>NOTE: </strong>Consider that this configuration is valid only for Apache 2.2.x installation, <strong>previous versions of apache don't have the <a href="http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html">authzn_ldap</a></strong> module.</p>
+<h3>Configuration</h3>
+<p>The configuration suggested by most of the svn books/posts sets up individual repositories for each file tree. But since each one requires it's own site on Apache, the administration could become a nightmare if you're creating/adding repositories all the time. Instead, the approach proposed on this post sets up a parent repository that works as a container for all the child repositories. </p>
+<h4>Configure the parent repository</h4>
+<p>Using the vi text-editor run the following command:</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">(su) vi /etc/apache2/conf.d/subversion.conf</pre></div>
+<p>You should edit the configuration to read the following</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">
+    
+        DAV svn
+        <span style="color: #008000">#Configures the location of the parent repositories (repo container)</span>
+        SVNParentPath /srv/svn/repositories/
+        <span style="color: #008000">#This flag allows you to navigate via http the existing repos on the container</span>
+        SVNListParentPath on
+    
+</pre></div>
+<p>If you don't include the <strong>SVNListParentPath</strong> on the configuration you'll get a <strong>Http 403.3 forbidden error.</strong></p>
+<p>Now let's configure the repository-container folder on the file system.<br></p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">mkdir -p /srv/svn/repositories/</pre></div>
+<p>Restart apache</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">(su) rcapache2 restart</pre></div>
+<p>Now you should be able to navigate your subversion by entering the address on the web-browser (<a href="http://localhost/repositories">http://localhost/repositories</a>), and your browser should display something like this:</p>
+<p><a title="empty_repository" href="http://www.flickr.com/photos/67651183@N00/2100796939/"><img alt="empty_repository" src="http://static.flickr.com/2173/2100796939_24654b5a02.jpg" border="0"></a></p>
+<h3>Setting up your first repository</h3>
+<p>Let's create a repository using the command-line tools provided as part of <strong><a href="http://subversion.tigris.org/">subversion-server</a> </strong>package</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace"><span style="color: #008000">#This command creates the SVN repository and all its required assets</span>
+(su) svnadmin create /srv/svn/repositories/myRepository
+<span style="color: #008000">#This command gives permissions to the apache worker process</span>
+(su) chown -R wwwrun:www /srv/svn/repositories/myRepository/{dav,db,locks}</pre></div>
+<p>Here we're setting up a repository called <em>myRepository, </em>you should see your repository on your web browser and also you should be able to navigate it on the web browser by entering the <a href="http://localhost/repositories/myRepository/">http://localhost/repositories/myRepository/</a> url.</p>
+<p><a title="one_repository" href="http://www.flickr.com/photos/67651183@N00/2100818429/"><img alt="one_repository" src="http://static.flickr.com/2205/2100818429_6698702c98.jpg" border="0"></a><br>(The repository under it's parent repository)</p>
+<p><a title="inside_empty_repository" href="http://www.flickr.com/photos/67651183@N00/2100821285/"><img alt="inside_empty_repository" src="http://static.flickr.com/2347/2100821285_3d0e147478.jpg" border="0"></a><br>(Inside the recently created repository)</p>
+<p>Further on this post, we'll go thru the common operations that you can perform on the repositories. Because the main focus of this post is the AD (W2K3) integration, let's see how to secure the repository.</p>
+<h3>Securing the repository</h3>
+<p>Authentication against <a href="http://en.wikipedia.org/wiki/Active_Directory">Active Directory</a> seems to be hard, mostly if you research on the web since most of available information is related to the older module authz_ldap that is not compatible with the 2.2.x version of the Apache.</p>
+<p>First of all you should <strong>turn off the <em>referrals </em>for the <a href="http://www.padl.com/pam_ldap.html">pam_ldap</a> module</strong>, because there's a problem when using Active Directory so you need to turn them off. Edit your <strong><em>/etc/ldap.conf</em></strong>  using a text-editor, and on the first line add:</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace">
+<div style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace"><span style="color: #606060">   1:</span> REFERRALS off</pre></div></div>
+<p>Now you are able to add the LDAP configuration directives to the recently created Apache Configuration. What we found useful is to test the Active Directory connection by using <a href="http://207.46.196.114/windowsserver/en/library/ebca3324-5427-471a-bc19-9aa1decd3d401033.mspx">ADSIEdit</a> or you can use this <a href="http://www-unix.mcs.anl.gov/~gawor/ldap/applet/applet.html">Applet Java LDAP Browser</a> to test the Active Directory lookup information. We strongly recommend you to create a new user to query Active Directory. </p>
+<p>Since the Authentication process on LDAP has to phases you should bind an account that performs the query (AD needs to be queried by a AD valid user). Said this, let's modify the apache configuration to be authenticate with AD.</p>
+<p>To open the Apache configuration use this command:</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">(su) vi /etc/apache2/conf.d/subversion.conf</pre></div>
+<p>Then your configuration should look like this:</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">
+    
+        DAV svn
+        <span style="color: #008000">#Configures the location of the parent repositories (repo container)</span>
+        SVNParentPath /srv/svn/repositories/
+        <span style="color: #008000">#This flag allows you to navigate via http the existing repos on the container</span>
+        SVNListParentPath on
+
+        <span style="color: #008000">#Everything below this line is related to LDAP configuration</span>
+        <span style="color: #008000">#This sets the AuthProvider to be the ldap provider</span>
+        AuthBasicProvider ldap
+        <span style="color: #008000">#Sets that the authentication type is basic (username &amp; password)</span>
+        AuthType Basic
+        <span style="color: #008000">#This flag indicates that the authentication process continues bubbling up</span>
+        AuthzLDAPAuthoritative off
+        <span style="color: #008000">#This is the message that will be displayed to the users when prompting for</span>
+        <span style="color: #008000">#for credentials </span>
+        AuthName <span style="color: #006080">"My Subversion server"</span>
+        <span style="color: #008000">#This is the search path for the AD (we'll explain this later)</span>
+        AuthLDAPURL <span style="color: #006080">"ldap://directory.example.com:389/
+DC=example,DC=com?sAMAccountName?sub?(objectClass=*)"</span> NONE
+        <span style="color: #008000">#This is the DN of the user performing the query (this could be also a</span>
+        <span style="color: #008000">#UPN: user@domain)</span>
+        AuthLDAPBindDN <span style="color: #006080">"CN=apache,CN=Users,DC=example,DC=com"</span>
+        <span style="color: #008000">#This is the password for the user performing the query</span>
+        AuthLDAPBindPassword hackme
+
+        <span style="color: #008000">#This flag indicates that only authenticated users can access this repos.</span>
+        require valid-user
+    
+</pre></div>
+<p>The AuthLDAPURL indicates the search path where authnz_ldap Apache module will look for the user name, the <strong>?sAMAccountName </strong>indicates that the username should match the value of that property for the user on AD. <strong>?sub </strong>indicates that the search should be performed recursively. Finally, <strong>(objectClass=*)</strong> indicates that the object type could be any (I play safe and choose to do <strong>objectClass=*</strong>).</p>
+<p>Now you should be able to navigate, but it'll prompt you for your domain credentials</p>
+<p><a title="credPrompt" href="http://www.flickr.com/photos/67651183@N00/2101749936/"><img alt="credPrompt" src="http://static.flickr.com/2087/2101749936_8542cd94d6.jpg" border="0"></a></p>
+<p><strong>IMPORTANT: </strong>Since the sAMAccountName doesn't include the domain name, avoid to user the form <strong>DOMAINNAME\user</strong><em>, </em>just enter your user name.</p>
+<h3>Configuring Authorization Policies</h3>
+<p>For authorization we're going to use the <strong>authz_svn</strong> Apache module, the authorization will be based on a text file, using the domain user name to establish policies or we can use custom groups either.</p>
+<h4></h4>
+<h4>Configuring Apache to use authz_svn</h4>
+<p>In order to use the <strong>authz_svn</strong> module we should open the Apache configuration by doing </p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">(su) vi /etc/apache2/conf.d/subversion.conf</pre></div>
+<p>Now we should configure the Apache to use a file for authorization policies definition, so the configuration should look like this</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">
+    
+        DAV svn
+        <span style="color: #008000">#Configures the location of the parent repositories (repo container)</span>
+        SVNParentPath /srv/svn/repositories/
+        <span style="color: #008000">#This flag allows you to navigate via http the existing repos on the container</span>
+        SVNListParentPath on
+
+        <span style="color: #008000">#Everything below this line is related to LDAP configuration</span>
+        <span style="color: #008000">#This sets the AuthProvider to be the ldap provider</span>
+        AuthBasicProvider ldap
+        <span style="color: #008000">#Sets that the authentication type is basic (username &amp; password)</span>
+        AuthType Basic
+        <span style="color: #008000">#This flag indicates that the authentication process continues bubbling up</span>
+        AuthzLDAPAuthoritative off
+        <span style="color: #008000">#This is the message that will be displayed to the users when prompting for</span>
+        <span style="color: #008000">#for credentials </span>
+        AuthName <span style="color: #006080">"My Subversion server"</span>
+        <span style="color: #008000">#This is the search path for the AD (we'll explain this later)</span>
+        AuthLDAPURL <span style="color: #006080">"ldap://directory.example.com:389/
+DC=example,DC=com?sAMAccountName?sub?(objectClass=*)"</span> NONE
+        <span style="color: #008000">#This is the DN of the user performing the query (this could be also a</span>
+        <span style="color: #008000">#UPN: user@domain)</span>
+        AuthLDAPBindDN <span style="color: #006080">"CN=apache,CN=Users,DC=example,DC=com"</span>
+        <span style="color: #008000">#This is the password for the user performing the query</span>
+        AuthLDAPBindPassword hackme
+
+        <span style="color: #008000">#This flag indicates that only authenticated users can access this repos.</span>
+        require valid-user
+
+        <span style="color: #008000">#This is the configuration for Authorization</span>
+        <span style="color: #008000">#The following directive defines the file used as AuthZ policies store</span>
+        AuthzSVNAccessFile /srv/svn/user_access/authz_policies
+    
+</pre></div>
+<p>Now we should create the file that defines the policies</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">(su) vi /srv/svn/user_access/authz_policies</pre></div>
+<p>The internal file structure is similar to a .ini file, below you will find a sample of how it looks like and then we'll go section by section explaining it's meaning</p>
+<div style="padding-right: 4px;padding-left: 4px;font-size: 8pt;padding-bottom: 4px;margin: 20px 0px 10px;width: 97.5%;padding-top: 4px;font-family: consolas, 'Courier New', courier, monospace"><pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">[groups]
+administrators = user, user2
+
+[myRepository:/]
+@administrators = rw
+sally = r
+bob =</pre></div>
+<h5>The [groups] section</h5>
+<p>Defines a group. The comma separated values are usernames, remember that since we have configured the integrated authentication the username should be a domain username.</p>
+<h5>The [myRepository:/] section</h5>
+<p>Defines permissions for a repository. The form is [respositoryName:path], the path is used when more granular permissions are desired (e.g. permissions for an specific branch or feature).</p>
+<p><strong>@administrators: </strong>indicates that the permissions are assigned to a group.<br><strong>sally= </strong>indicates that the permissions are only assigned to user sally.</p>
+<h5>Values for the permissions</h5>
+<table style="width: 400px;border: 1px solid" cellspacing="0" cellpadding="4">
+<tbody>
+<tr>
+<td valign="top" width="200">Value</td>
+<td valign="top" width="200">Meaning</td></tr>
+<tr>
+<td valign="top" width="200"><strong>r</strong></td>
+<td valign="top" width="200">read</td></tr>
+<tr>
+<td valign="top" width="200"><strong>w</strong></td>
+<td valign="top" width="200">write</td></tr>
+<tr>
+<td valign="top" width="200"><strong>rw</strong></td>
+<td valign="top" width="200">read and write</td></tr>
+<tr>
+<td valign="top" width="200"> </td>
+<td valign="top" width="200">no permissions</td></tr></tbody></table>
+<p><strong>NOTE: </strong>When a user or group is not mentioned below a repository section <strong>it won't get access of any type</strong>.</p>
+<h3>Further Reading</h3>
+<p>These are useful links that helped when doing this:</p>
+<ul>
+<li><a href="http://www-unix.mcs.anl.gov/~gawor/ldap/applet/applet.html">http://www-unix.mcs.anl.gov/~gawor/ldap/applet/applet.html</a> 
+<li><a href="http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html">http://httpd.apache.org/docs/2.2/mod/mod_authnz_ldap.html</a> 
+<li><a href="http://svnbook.red-bean.com/nightly/en/svn.serverconfig.httpd.html">http://svnbook.red-bean.com/nightly/en/svn.serverconfig.httpd.html</a> 
+<li><a href="http://www.debianhelp.co.uk/apachead.htm">http://www.debianhelp.co.uk/apachead.htm</a></li></ul>
+<p>thanks,<br>~johnny</p>
+      

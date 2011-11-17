@@ -1,0 +1,92 @@
+--- 
+layout: post
+title: The Often ... The Better
+published: true
+meta: 
+  _edit_last: "42"
+  _edit_lock: "1217837150"
+tags: 
+- build server
+- Guidance
+- integration services
+- software development
+- solution architecture
+- TDD
+type: post
+status: publish
+---
+While attending some CMMi courses that we held at <a href="http://blogs.southworks.net/">Southworks</a>, and reading some papers about re-work written by Watt Humphrey and the <a href="http://www.sei.cmu.edu/">CMU-SEI crew</a>, I started thinking about how to avoid rework and what do I do to avoid re work while coding.
+
+I realized while asking myself a couple of questions and analyzing the code review results for the reviews I conducted that most of the people make the code work, check the code in and then start caring about the quality of that code. For example most of the people check in code that doesn't meet the code standards and then they do another check in in order to fix those.
+
+I came up with <strong>10 do's and don'ts </strong>while coding that helped me understand how to avoid rework and ensure the health of our deliverables on every check in.
+<h3>10 Do's and Dont's to avoid quality rework</h3>
+These do's and don'ts aren't a silver bullet but they may help you as a strong starting point for avoiding rework on quality related subjects.
+<h4>Do check-in often</h4>
+As Alex always says <em>Software Development is a team sport played by talented individuals</em>. While you keep your code in your local machine you're also putting a barrier between your work and the rest of the world's work. Doing check in often helps you on integration, avoiding conflicts and even better gives the team visibility on where are you in terms of what you committed to do. In the other hand if you don't commit often, be prepared to spend half a day fixing the code to avoid conflicts.
+<h4>Do run StyleCop each time you modify a source code file</h4>
+Code Standards are something big to be treated on another post by itself but as summary I'll say that in Southworks we chose the working software over the comprehensive documentation as the <a href="http://www.agilemanifesto.org">Agile Manifesto</a> states.
+
+We have chosen to use <a href="http://code.msdn.microsoft.com/sourceanalysis">Microsoft's StyleCop</a> to validate our code standards. Most of the code that we write often goes public, and it's important to demonstrate that we follow a single line of thinking and the code has signature that differentiates it  from others code but also that the code is written in the same way by all the developers on the company.
+
+In order to accomplish this, is as simple as doing right click on the source code file in Visual Studio and then <strong>Run Source Analysis. </strong>It<strong> </strong>won't add an overhead to your regular coding routine but will ensure that the code is written on a consistent fashion the first time.
+
+<a href="http://blogs.southworks.net/jhalife/files/2008/08/image.png"><img src="http://blogs.southworks.net/jhalife/files/2008/08/image-thumb.png" border="0" alt="image" width="373" height="79" /></a> 
+
+<em>How to run source analysis</em>
+<h4>Do run Code Analysis prior every check in</h4>
+<a href="http://msdn.microsoft.com/en-us/library/bb429476(vs.80).aspx">Code Analysis (a.k.a FxCop)</a> is the tool that validates the best practices of the Microsoft.net Framework. It's based <a href="http://www.amazon.com/Framework-Design-Guidelines-Conventions-Development/dp/0321246756">on the book written</a> by <a href="http://blogs.msdn.com/brada">Brad Abrams</a> and <a href="http://blogs.msdn.com/kcwalina">Krzysztof Cwalina</a>. The best practices described there were ported to an application known as FxCop.
+
+Following Code Analysis guidelines ensures that our code is leveraging the Microsoft.net framework in the best way it can be done. And the same as Style Cop (a.k.a Source Analysis) it can be done by doing right click on an assembly in Visual Studio and then choosing the <strong>Run Code Analysis </strong>option from the context menu.
+
+Again, doing this the first time is better than reworking the code and re committing to the main line twice in order to do it and then to fix it.
+
+<a href="http://blogs.southworks.net/jhalife/files/2008/08/image1.png"><img src="http://blogs.southworks.net/jhalife/files/2008/08/image-thumb1.png" border="0" alt="image" width="397" height="65" /></a>
+
+<em>How to run Code Analysis.</em>
+<h4>Consider branching out code that may introduce risk to your deliverables</h4>
+This is pretty obvious, sometimes you think a problem can be solved using some kind of approach that might have an impact on others work. The solution there is to branch the code out and don't introduce the risk while you're not sure that this will be the final solution or at least that your solution works.
+
+Why is this? Some people might choose to keep it outside the source control but experience tell us that no source control will turn into something painful if something happens.
+
+I'll write another post about <a href="http://git.or.cz/">GIT</a> which leverages this by having a local repository for each developer but that's another story.
+<h4>Do not forget the commit message</h4>
+<a href="http://blogs.southworks.net/jhalife/files/2008/08/image2.png"><img src="http://blogs.southworks.net/jhalife/files/2008/08/image-thumb2.png" border="0" alt="image" width="564" height="98" /></a>
+
+Look at the log above what can you tell about what's going on on the project? If you don't include a comment, a note, a reference to a requirement or something that states what are you committing you can get your team in trouble if you have to do any rollback or review of the requirements implementation.
+
+It's a 1 minute thing to say what are you committing and why are you committing, that also forces you to think what problem, requirement or commitment are you closing with that check in.
+<h4>Do be polite with the Integration Server</h4>
+This one is loved by my friend <a href="http://blogs.southworks.net/jpgarcia">.jpg</a> who is our Build Server &amp; Tooling ranger. People often get confused with the intent of an Integration Server. The Integration Server is used to verify that there's harmony in your repository, it's not your tool to validate your code against. You should verify your work against it but don't use it processor cycles to do your validation work.
+
+Our build process is complex enough that might take at least 2 minutes to build a project, people often think that is the Integration Server responsibility to validate your process. Truth to be told, the intent of the Build Server is just to verify that there's no integration problems and that all the code follows a standard.
+
+Although the quick feedback is the most important part of the build server, you should have in mind that is a verification of work and it doesn't do the validation you're supposed to do.
+<h4>Do not check in prototype quality code to your main line</h4>
+I won't go further on this one, <a href="http://blogs.msdn.com/eric_brechner/archive/2008/08/01/my-experiment-worked-prototyping.aspx">I recommend you to read I.M Wright's post about Prototyping that he just posted</a>. As an spoiler I can tell you that the title gives a clear message "My experiment worked!".
+<h4>Do not check in until all tests pass</h4>
+<a href="http://blogs.southworks.net/jhalife/files/2008/08/image3.png"><img src="http://blogs.southworks.net/jhalife/files/2008/08/image-thumb3.png" border="0" alt="image" width="465" height="140" /></a>
+
+This one seems pretty obvious, <a href="http://blogs.southworks.net/jhalife/2008/07/28/make-it-once-make-it-right">I wrote a post about TDD last week</a> and most of the people nowadays are adopting this practice. The important thing and a killing feature of TDD is that you are a click away of doing regression testing on all the code and check that nothing got broken with your changes.
+
+Sometimes you get green on yours and then just wait to the Integration Server or another developer to complain about your work. This is the case where you should be polite not only with the integration server but also with your co-workers making sure that nothing is broken because of your changes.
+
+<em>NOTE: If you are running a huge solution with thousands of tests you might want to run just those hundreds tests on the impact surface of your code.</em>
+<h4>Do ad-hoc peer reviews to validate your logical thinking</h4>
+Two pair eyes of eyes see better than just one. That's the rationale behind this point. Developers (and I include myself on the subset) love to put their headphones, enter their matrix kindda world and write code as the music moves forward. But as I said on the first point Software Development is a team sport and a team that cooperates is by far more candidate to win.
+
+Do not wait until the formal Code Review comes up to you and you have to explain what you've done. Just put pause on iTunes for 5 seconds, ask your nearest team member (doesn't matter his expertise always there's something good to learn from our peers) what does he think about your idea and that's it. You just had a peer review.
+<h4>Do be consistent and disciplined while applying the nine practices above</h4>
+<img src="http://www.piedeliek.nl/Master%20Yoda.jpg" alt="" width="166" height="245" align="left" />
+
+<strong>Now you know it, but the practice makes the master.</strong> Fasten your seatbelt and get ready to improve your personal development process. You and your team will be happy to share a principles in terms of quality so your code is nice, easy to maintain and well written.
+
+And your team as all the famous painters will have a code signature that will distinguish yourselves from the rest of the mere mortals.
+<h3> </h3>
+<h3> </h3>
+<h3> </h3>
+<h3>And in the end....</h3>
+One thing that I've learnt from people that have years working on Software Quality and people that I met like <a href="http://blogs.msdn.com/eric_brechner/">Eric Brechner</a> (Microsoft Engineering Excellence Director) is that <strong>the most important thing when talking about Software Quality is defining done</strong>. If you follow these simple steps you will be closer as a team to produce code in a standard and consistent basis while starting to define the meaning of done for code.
+
+thanks,
+~johnny

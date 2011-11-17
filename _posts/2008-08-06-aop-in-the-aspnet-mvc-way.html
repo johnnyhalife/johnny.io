@@ -1,0 +1,243 @@
+--- 
+layout: post
+title: AOP in the ASP.NET MVC way
+published: true
+meta: {}
+
+tags: 
+- aop
+- asp.net mvc
+- cool stuff
+- dfo
+- solution architecture
+type: post
+status: publish
+---
+<div style="padding-right: 5px;padding-left: 5px;padding-bottom: 5px;padding-top: 5px">   <p><strong>DISCLAIMER. </strong><em>The following post applies to the Microsoft ASP.NET MVC Extensions (Preview 4) that have been published on July 16th to the <a href="http://www.codeplex.com/aspnet/">ASP.NET Community Web Site at Codeplex</a>.</em></p> </div>  <p>Last week I was discussing with <a href="http://blogs.southworks.net/mwoloski">Mat&#237;as</a> about the implementation of DFO (Design For Operations) for a system we are building at Southworks. Our discussion took us to an <a href="http://ayende.com/Blog/archive/2008/07/31/Logging--the-AOP-way.aspx">Ayende's post that talks about Logging The AOP&#160; Way for .NET.</a> At that moment we thought that's what we want. </p>  <p>Later on, <a href="http://weblogs.asp.net/scottgu/archive/2008/07/14/asp-net-mvc-preview-4-release-part-1.aspx">reading ScottGu's blog</a>, we realized that a filtering pipeline has been built for the ASP.NET MVC, so we thought about mixing what ScottGu's blog says to achieve what Oren's was posting on <em>Logging the AOP Way.</em></p>  <p>I have divided this post in two parts, the first is the conceptual part where I'm going to discuss a little bit about the Filtering model of ASP.NET MVC and then I'll show a little how-to build a custom tracing filter.</p>  <h3>What are ASP.NET MVC Filter Interceptors?</h3>  <p>As described in <a href="http://weblogs.asp.net/scottgu/archive/2008/07/14/asp-net-mvc-preview-4-release-part-1.aspx">ScottGu's post</a> <em>Action Filter Attributes</em> are declarative way to inject code that can be executed <em>pre and post </em>controller's action execution. Also the same can be done for <em>pre and post ActionResult </em>conversion into an ASP.NET response. This enables another way to do AOP and achieve for example the logging described by <a href="http://ayende.com/Blog/archive/2008/07/31/Logging--the-AOP-way.aspx">Oren's at his post</a>.</p>  <h4></h4>  <h4>How do they work? </h4>  <p>In order to understand how do they work let's analyze how does the ASP.NET MVC pipeline goes. Below is a diagram that demonstrates how does an action flows from the <em>HttpRequest </em>until the <em>ActionResult </em>gets executed.</p>  <p><a href="http://blogs.southworks.net/jhalife/files/2008/08/image4.png"><img height="301" alt="image" src="http://blogs.southworks.net/jhalife/files/2008/08/image-thumb4.png" width="482" border="0" /></a> </p>  <p>Now, let's go one by one the items diagrams and I'll try to explain what's happening on each part:</p>  <ol>   <li>The user makes a call using the browser. </li>    <li>Given the URI of the request the ASP.NET MVC Handlers looks for the appropriated controller using the Routes configured on the Global.asax. Prior instantiating the controller a <em>ControllerContext</em> is created. It wraps ,among other things, the current <em>HttpContext</em> for a given request execution. </li>    <li>The ASP.NET MVC engine, instantiates the appropriated controller passing the current context as a parameter. </li>    <li>The controller executes the action that correspond to the current <em>Route</em>. </li>    <li>As a result of the <em>Action </em>execution an <em>ActionResult</em> is returned to the context, given the <em>ActionResult</em> implementation type (must inherit from <em>ActionResult) </em>it might be turned into a View (ASPX Page) or JSON as an example. </li> </ol>  <p>Now that the baseline execution context is a little bit dissected let's explain where does the ActionFilter attributes hook to this model.</p>  <p><a href="http://blogs.southworks.net/jhalife/files/2008/08/image5.png"><img height="362" alt="image" src="http://blogs.southworks.net/jhalife/files/2008/08/image-thumb5.png" width="481" border="0" /></a> </p>  <p>The items <em>squared with black</em> on the diagram above are the hooks that can be used to inject the code. Those are the interaction points where we can create our hooks and perform crosscutting operations like logging, tracing, error handling and even authZ and authN.</p>  <ul>   <li><strong>OnActionExecuting. </strong>The ActionExecuting contains all the data about the action that is going to be executed prior its execution. </li>    <li><strong>OnActionExecuted. </strong>The ActionExecuted contains all the data gathered after the action execution. </li>    <li><strong>OnResultExecuting. </strong>The ResultExecuting contains all the data about the <em>ActionResult </em>that is going to be executed. Two of the differences that you will find between this and the previous hook are:       <ul>       <li>If the Action execution ends in an exception you&#160; might not reach this point. </li>        <li>If the user called for example &quot;View()&quot; which renders the default view for that action, in the previous one you don't know the view name. </li>     </ul>   </li>    <li><strong>OnResultExecuted. </strong>The ResultExecuted contains all the data gathered while the <em>ActionResult</em> was turning into an ASP.NET Response. </li> </ul>  <p>Up to now we understand how does this ActionFilter pipeline works and which data we can get from it. Now, you might be wondering how do you get this in your code. It's just simple as decorating your <em>Controller</em> and/or <em>Action</em> with the desired <em>Action Filter </em>attribute.</p>  <div>   <pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, &#39;Courier New&#39;, courier, monospace">[TraceFilter]
+<span style="color: #0000ff">public</span> ActionResult Index()
+{
+    ViewData[<span style="color: #006080">&quot;Title&quot;</span>] = <span style="color: #006080">&quot;Home Page&quot;</span>;
+    ViewData[<span style="color: #006080">&quot;Message&quot;</span>] = <span style="color: #006080">&quot;Welcome to ASP.NET MVC!&quot;</span>;
+
+    <span style="color: #0000ff">return</span> View();
+}</pre>
+</div>
+
+<p>In the example above I placed a custom attribute called <em>TraceFilterAttribute</em> that is a custom <em>Filter </em>I have created for demo purposes. Wondering how? Read below! :)</p>
+
+<h3>Do it yourself, your own ActionFilterAttribute in 5 minutes.</h3>
+
+<p>In this section we will discuss how to create a custom attribute. This attribute will trace the calls to the controller and log them like:</p>
+
+<p><a href="http://blogs.southworks.net/jhalife/files/2008/08/image6.png"><img height="75" alt="image" src="http://blogs.southworks.net/jhalife/files/2008/08/image-thumb6.png" width="489" border="0" /></a>&#160;</p>
+
+<p>The log entry above displays the Date Time the entry happend, the warn level [Debug ||&#160; Fatal || Error || Information] and the parameters if they were any. </p>
+
+<h4>Step by Step sample</h4>
+
+<h3></h3>
+
+<ol>
+  <li><strong>Open Visual Studio </strong>(ASP.NET MVC works on Web Express versions of VS2008). 
+
+    <br /></li>
+
+  <li><strong>Create a new ASP.NET MVC Web Application </strong>and name it as you want. 
+
+    <br /></li>
+
+  <li>Using the Solution Explorer, <strong>create a folder on web site's root and name it Filters. 
+      <br />
+
+      <br /></strong><a href="http://blogs.southworks.net/jhalife/files/2008/08/image7.png"><strong><img height="224" alt="image" src="http://blogs.southworks.net/jhalife/files/2008/08/image-thumb7.png" width="186" border="0" /></strong></a><strong> 
+      <br /></strong><em>(Figure 1. - Filters folder on Solution Explorer)</em> 
+
+    <br /></li>
+
+  <li><strong>Add a new Class file and name it TraceFilterAttribute.</strong> 
+
+    <br /></li>
+
+  <li><strong>Delete the TraceFilterAttribute class declaration from the file.</strong> 
+
+    <br /></li>
+
+  <li>Inside the namespace declaration, <strong>use the attribute code snippet to create the attribute structure. 
+      <br />
+
+      <br /></strong><a href="http://blogs.southworks.net/jhalife/files/2008/08/image8.png"><strong><img height="282" alt="image" src="http://blogs.southworks.net/jhalife/files/2008/08/image-thumb8.png" width="417" border="0" /></strong></a> 
+
+    <br /><em>(Figure 2. Using the Attribute code snippet).</em><strong>&#160;</strong> 
+
+    <br /></li>
+
+  <li>Name your attribute (using the snippet) <strong><em>TraceFilterAttribute</em> and make it inherit from the <em>ActionFilterAttribute. 
+        <br />
+
+        <br /></em></strong>
+
+    <div>
+      <pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 109.34%;color: black;padding-top: 0px;font-family: consolas, &#39;Courier New&#39;, courier, monospace;height: 64px">[AttributeUsage(AttributeTargets.All, Inherited = <span style="color: #0000ff">false</span>, AllowMultiple = <span style="color: #0000ff">true</span>)]
+<span style="color: #0000ff">public</span> <span style="color: #0000ff">sealed</span> <span style="color: #0000ff">class</span> TraceFilterAttribute : ActionFilterAttribute
+{
+}</pre>
+
+      <br /></div>
+  </li>
+
+  <li><strong>Copy and paste</strong> the code below inside your class declaration 
+
+    <br />
+
+    <br />
+
+    <div>
+      <pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 148.08%;color: black;padding-top: 0px;font-family: consolas, &#39;Courier New&#39;, courier, monospace;height: 368px"><span style="color: #0000ff">public</span> <span style="color: #0000ff">override</span> <span style="color: #0000ff">void</span> OnActionExecuting(ActionExecutingContext filterContext)
+{
+        StringBuilder builder = <span style="color: #0000ff">new</span> StringBuilder();
+        filterContext.ActionParameters.ToList()
+                                      .ForEach(a =&gt; builder.AppendFormat(<span style="color: #006080">&quot;{0}:{1}; &quot;</span>, 
+                                                                         a.Key, 
+                                                                         a.Value ?? <span style="color: #006080">&quot;{empty}&quot;</span>));
+        var parameters = builder.ToString();
+
+        var message = <span style="color: #0000ff">string</span>.Format(CultureInfo.InvariantCulture,
+            <span style="color: #006080">&quot;{0} {1}.{2} =&gt; {3}&quot;</span>,
+            filterContext.ActionMethod.ReturnType,
+            filterContext.Controller.GetType().Name,
+            filterContext.ActionMethod.ToString().Replace(filterContext.ActionMethod.ReturnType.ToString(), 
+                                                          <span style="color: #0000ff">string</span>.Empty)
+                                                 .Trim(),
+            <span style="color: #0000ff">string</span>.IsNullOrEmpty(parameters) ? <span style="color: #006080">&quot;(void)&quot;</span> : parameters);
+
+        <span style="color: #0000ff">this</span>.logger.Debug(message);
+}</pre>
+
+      <br /></div>
+  </li>
+
+  <li>The <em>Logger </em>used above <strong><a href="http://logging.apache.org/log4net/index.html">is using Log4Net</a></strong>, which provides and easy and configurable way to do <em>logging. 
+      <br /></em></li>
+
+  <li>In order to configure the logger (once you have added the reference to Log4Net) <strong>copy and paste</strong> the following to your section declaration in your <em>web.config. 
+      <br />
+
+      <br /></em>
+
+    <div>
+      <pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 161.43%;color: black;padding-top: 0px;font-family: consolas, &#39;Courier New&#39;, courier, monospace;height: 16px"><em><span style="color: #0000ff">&lt;</span><span style="color: #800000">section</span> <span style="color: #ff0000">name</span><span style="color: #0000ff">=&quot;log4net&quot;</span> <span style="color: #ff0000">type</span><span style="color: #0000ff">=&quot;log4net.Config.Log4NetConfigurationSectionHandler, log4net&quot;</span> <span style="color: #ff0000">requirePermission</span><span style="color: #0000ff">=&quot;false&quot;</span><span style="color: #0000ff">/&gt;</span></em></pre>
+    </div>
+
+    <div>&#160;</div>
+  </li>
+
+  <li>Now <strong>include this other chunk of XML before the &lt;/configuration&gt; tag</strong>. 
+
+    <br />
+
+    <br />
+
+    <div>
+      <pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 135.73%;color: black;padding-top: 0px;font-family: consolas, &#39;Courier New&#39;, courier, monospace;height: 272px"><span style="color: #0000ff">&lt;</span><span style="color: #800000">log4net</span><span style="color: #0000ff">&gt;</span>
+  <span style="color: #008000">&lt;!-- The DebugFileAppender writes all messages to a log file--&gt;</span>
+  <span style="color: #0000ff">&lt;</span><span style="color: #800000">appender</span> <span style="color: #ff0000">name</span><span style="color: #0000ff">=&quot;RollingLogFileAppender&quot;</span> <span style="color: #ff0000">type</span><span style="color: #0000ff">=&quot;log4net.Appender.RollingFileAppender&quot;</span><span style="color: #0000ff">&gt;</span>
+    <span style="color: #0000ff">&lt;</span><span style="color: #800000">file</span> <span style="color: #ff0000">value</span><span style="color: #0000ff">=&quot;logfile.txt&quot;</span> <span style="color: #0000ff">/&gt;</span>
+    <span style="color: #0000ff">&lt;</span><span style="color: #800000">appendToFile</span> <span style="color: #ff0000">value</span><span style="color: #0000ff">=&quot;true&quot;</span> <span style="color: #0000ff">/&gt;</span>
+    <span style="color: #0000ff">&lt;</span><span style="color: #800000">rollingStyle</span> <span style="color: #ff0000">value</span><span style="color: #0000ff">=&quot;Size&quot;</span> <span style="color: #0000ff">/&gt;</span>
+    <span style="color: #0000ff">&lt;</span><span style="color: #800000">maxSizeRollBackups</span> <span style="color: #ff0000">value</span><span style="color: #0000ff">=&quot;-1&quot;</span> <span style="color: #0000ff">/&gt;</span>
+    <span style="color: #0000ff">&lt;</span><span style="color: #800000">maximumFileSize</span> <span style="color: #ff0000">value</span><span style="color: #0000ff">=&quot;50GB&quot;</span> <span style="color: #0000ff">/&gt;</span>
+    <span style="color: #0000ff">&lt;</span><span style="color: #800000">layout</span> <span style="color: #ff0000">type</span><span style="color: #0000ff">=&quot;log4net.Layout.PatternLayout&quot;</span><span style="color: #0000ff">&gt;</span>
+      <span style="color: #0000ff">&lt;</span><span style="color: #800000">conversionPattern</span> <span style="color: #ff0000">value</span><span style="color: #0000ff">=&quot;(%date) [%-5level] %message%newline&quot;</span> <span style="color: #0000ff">/&gt;</span>
+    <span style="color: #0000ff">&lt;/</span><span style="color: #800000">layout</span><span style="color: #0000ff">&gt;</span>
+  <span style="color: #0000ff">&lt;/</span><span style="color: #800000">appender</span><span style="color: #0000ff">&gt;</span>
+  <span style="color: #0000ff">&lt;</span><span style="color: #800000">root</span><span style="color: #0000ff">&gt;</span>
+    <span style="color: #008000">&lt;!-- add other appenders here and the log messages will be sent to every listed appender --&gt;</span>
+    <span style="color: #0000ff">&lt;</span><span style="color: #800000">appender-ref</span> <span style="color: #ff0000">ref</span><span style="color: #0000ff">=&quot;RollingLogFileAppender&quot;</span> <span style="color: #0000ff">/&gt;</span>
+  <span style="color: #0000ff">&lt;/</span><span style="color: #800000">root</span><span style="color: #0000ff">&gt;</span>
+<span style="color: #0000ff">&lt;/</span><span style="color: #800000">log4net</span><span style="color: #0000ff">&gt;</span></pre>
+    </div>
+
+    <div>&#160;</div>
+  </li>
+
+  <li>In order to consume the logger using Log4Net <strong>copy and paste </strong>the following code <strong>inside your class declaration 
+      <br />
+
+      <br /></strong>
+
+    <div>
+      <pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, &#39;Courier New&#39;, courier, monospace"><span style="color: #0000ff">private</span> ILog logger;
+
+<span style="color: #0000ff">public</span> TraceFilterAttribute()
+{
+    XmlConfigurator.Configure();
+    <span style="color: #0000ff">this</span>.logger = LogManager.GetLogger(<span style="color: #0000ff">typeof</span>(TraceFilterAttribute));
+}</pre>
+    </div>
+
+    <div>&#160;</div>
+  </li>
+
+  <li>Now that we have built the attribute, let's apply it to the Index() method on the HomeController.cs . Your code should look like this: 
+    <br />
+
+    <br />
+
+    <div>
+      <pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, &#39;Courier New&#39;, courier, monospace">[TraceFilter]
+<span style="color: #0000ff">public</span> ActionResult Index()
+{
+    ViewData[<span style="color: #006080">&quot;Title&quot;</span>] = <span style="color: #006080">&quot;Home Page&quot;</span>;
+    ViewData[<span style="color: #006080">&quot;Message&quot;</span>] = <span style="color: #006080">&quot;Welcome to ASP.NET MVC!&quot;</span>;
+
+    <span style="color: #0000ff">return</span> View();
+}</pre>
+
+      <br /></div>
+  </li>
+
+  <li><strong>Press F5 and you will see the default MVC home page. 
+      <br />
+
+      <br /><a href="http://blogs.southworks.net/jhalife/files/2008/08/image9.png"><img height="400" alt="image" src="http://blogs.southworks.net/jhalife/files/2008/08/image-thumb9.png" width="458" border="0" /></a>&#160; <br /></strong></li>
+
+  <li>Now go the web application project directory and look for the <strong>logfile.txt.</strong> 
+
+    <br /></li>
+
+  <li>Open the <strong>logfile.txt, </strong>it should look like this 
+
+    <br />
+
+    <br /><a href="http://blogs.southworks.net/jhalife/files/2008/08/image6.png"><img height="75" alt="image" src="http://blogs.southworks.net/jhalife/files/2008/08/image-thumb6.png" width="489" border="0" /></a>&#160; <br /></li>
+
+  <li><strong>That's it , you've built your own Action Filter Attribute.</strong> </li>
+</ol>
+
+<h4><strong></strong></h4>
+
+<h4>One more little&#160; trick </h4>
+
+<p>You might want to turn this sample into something for real, there's a trick that will enable you do the tracing just if debug is enabled. All that you have to do is surround the OnActionExecuting method body with the code depicted below.</p>
+
+<div>
+  <pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, &#39;Courier New&#39;, courier, monospace"><span style="color: #0000ff">if</span> (filterContext.HttpContext.IsDebuggingEnabled)
+{
+    <span style="color: #008000">// The method body goes here.</span>
+}</pre>
+</div>
+
+<p>Now, your attribute will log data just if the Debug mode is enabled on the web.config of your application.</p>
+
+<div>
+  <pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, &#39;Courier New&#39;, courier, monospace"><span style="color: #0000ff">&lt;</span><span style="color: #800000">compilation</span> <span style="color: #ff0000">debug</span><span style="color: #0000ff">=&quot;true&quot;</span><span style="color: #0000ff">&gt;</span></pre>
+</div>
+
+<div>&#160;</div>
+
+<h3>Conclusion</h3>
+
+<p>We've learnt how to develop a custom <em>Action Filter Attribute. </em>This is a very powerful and cool feature of ASP.NET MVC. This enables you to do logging, tracing and exception handling. I love this approach of doing AOP with Interceptors and the most that I like that is built in to the technology. There's unlimited power on this, but remember a great power also means a great responsibility.</p>
+
+<p>thanks, 
+  <br />~johnny</p>

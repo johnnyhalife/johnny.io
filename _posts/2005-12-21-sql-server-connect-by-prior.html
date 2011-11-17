@@ -1,0 +1,31 @@
+--- 
+layout: post
+title: "SQL Server : Connect By Prior"
+published: true
+meta: {}
+
+tags: []
+
+type: post
+status: publish
+---
+
+        <P><FONT face="Tahoma" size="2">Oracle database give us the posibility to retrive hicherical data from database using <EM>Connect By Prior</EM>. This sentence is usefull for retrive Trees from tables sorted by level, but SqlServer lacks of this sentence turns Trees retriving topics a little messy. But consider this example that could help make things easier.</FONT></P>
+<P><FONT face="Tahoma" size="2">First consider this table:</FONT></P>
+<P><FONT color="#0000ff" size="2">CREATE TABLE</FONT> <FONT size="2">Topic (<BR> TopicId  <FONT color="#0000ff">VARCHAR</FONT>(255) ,<BR> DisplayName  <FONT color="#0000ff">VARCHAR</FONT>(255) <FONT color="#a9a9a9">NULL</FONT> ,<BR> ParentTopicId <FONT color="#0000ff">VARCHAR</FONT>(255) <FONT color="#a9a9a9">NULL</FONT> ,<BR><BR></FONT><FONT size="2"> <FONT color="#0000ff">CONSTRAINT</FONT> UK_TopicId <FONT color="#0000ff">UNIQUE CLUSTERED</FONT> (<BR>  TopicId )<BR>)<BR>GO</FONT></P>
+<P><FONT face="Tahoma" size="2">In <EM>Topic </EM>table<EM>  TopicId </EM>defines<EM> </EM>the topic uniqueidentifier and the <EM>ParentTopicId </EM>defines who is it's parent.</FONT></P>
+<P><FONT face="Tahoma" size="2">Now consider this <EM>StoredProcedure</EM></FONT></P>
+<P><FONT size="2"><FONT color="#0000ff">CREATE PROCEDURE</FONT> dbo.TopicGetTree<BR> @TopicId <FONT color="#0000ff">VARCHAR</FONT>(255) = <FONT color="#a9a9a9">NULL</FONT><BR><FONT color="#0000ff">AS</FONT><BR><FONT color="#0000ff">BEGIN</FONT> <BR> <FONT color="#000000"><FONT color="#0000ff">SET</FONT> </FONT>NOCOUNT <FONT color="#0000ff">ON</FONT></FONT></P>
+<P><FONT size="2"> <FONT color="#0000ff">DECLARE</FONT> @Level INT<BR> <FONT color="#0000ff">DECLARE</FONT> @ParentTopicId <FONT color="#0000ff">VARCHAR</FONT>(255)</FONT></P>
+<P><FONT size="2"> <FONT color="#0000ff">CREATE TABLE</FONT> #output (<BR>  ParentTopicId <FONT color="#0000ff">VARCHAR</FONT>(255),<BR>  TopicId <FONT color="#0000ff">VARCHAR</FONT>(255),<BR>  Level <FONT color="#0000ff">INT</FONT><BR> )</FONT></P>
+<P><FONT size="2"> <FONT color="#0000ff">CREATE TABLE</FONT> #stack (<BR>  Parent <FONT color="#0000ff">VARCHAR</FONT>(255),<BR>  Item <FONT color="#0000ff">VARCHAR</FONT>(255),<BR>  Level  <FONT color="#0000ff">INT</FONT><BR> )</FONT></P>
+<P><FONT size="2"> <FONT color="#0000ff">INSERT INTO</FONT> #stack <FONT color="#0000ff">VALUES</FONT> (NULL, @TopicId, 1)</FONT></P>
+<P><FONT size="2"> <FONT color="#0000ff">SELECT</FONT> @Level = 1</FONT></P>
+<P><FONT size="2"> <FONT color="#0000ff">WHILE</FONT> @Level &gt; 0<BR> <FONT color="#0000ff">BEGIN</FONT><BR>  <FONT color="#0000ff">IF</FONT> <FONT color="#a9a9a9">EXISTS</FONT> (<FONT color="#0000ff">SELECT</FONT> 1 <FONT color="#0000ff">FROM</FONT> #stack <FONT color="#0000ff">WHERE</FONT> [Level] = @Level)<BR>  <FONT color="#0000ff">BEGIN</FONT></FONT></P>
+<P><FONT size="2">   <FONT color="#0000ff">SELECT</FONT><BR>    @ParentTopicId = Parent,<BR>    @TopicId = Item<BR>   <FONT color="#0000ff">FROM</FONT> <BR>    #stack<BR>   <FONT color="#0000ff">WHERE</FONT> <BR>    Level = @level</FONT></P>
+<P><FONT size="2">   <FONT color="#0000ff">INSERT INTO</FONT> #output <FONT color="#0000ff">VALUES</FONT> (@ParentTopicId, @TopicId, @Level)</FONT></P>
+<P><FONT size="2">   <FONT color="#0000ff">DELETE FROM</FONT> #stack <FONT color="#0000ff">WHERE</FONT> Level = @Level AND Item = @TopicId</FONT></P>
+<P><FONT size="2"> <FONT color="#0000ff">  INSERT INTO</FONT> #stack (Parent, Item, Level)<BR>   <FONT color="#0000ff">SELECT</FONT><BR>    ParentTopicId,<BR>    TopicId,<BR>    @Level + 1<BR>   <FONT color="#0000ff">FROM</FONT> Topic<BR>   <FONT color="#0000ff">WHERE</FONT> Topic.ParentTopicId = @TopicId</FONT></P>
+<P><FONT size="2">   <FONT color="#0000ff">IF</FONT> <FONT color="#ffc0cb">@@ROWCOUNT</FONT> &gt; 0<BR>    <FONT color="#0000ff">SELECT</FONT> @Level = @Level + 1<BR>   <BR>  <FONT color="#0000ff">END<BR>  ELSE<BR>  BEGIN<BR>   SELECT</FONT> @Level = @Level - 1<BR><FONT color="#0000ff">  END<BR> END</FONT></FONT></P>
+<P><FONT size="2"> <FONT color="#0000ff">SELECT</FONT><BR>              ParentTopicId,<BR>              TopicId,<BR>              Level<BR> <FONT color="#0000ff">FROM</FONT>   <BR>               </FONT><FONT size="2">#output<BR><FONT color="#0000ff">END</FONT><BR>GO</FONT></P>
+      

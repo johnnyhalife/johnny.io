@@ -1,0 +1,22 @@
+--- 
+layout: post
+title: How CAB and TDD helps doing better designs
+published: true
+meta: {}
+
+tags: []
+
+type: post
+status: publish
+---
+<p>The last months I&#8217;ve been working on an exciting project using <a href="http://blogs.msdn.com/vsto2/">VSTO</a>, Excel and <a href="http://msdn.microsoft.com/vstudio/teamsystem/team/">Team Foundation Server</a>. We discussed with <a href="http://staff.southworks.net/blogs/matias">Matias </a>how we should design this application.&#160; In this kind of projects, a great deal happens in the spreadsheet, and the business logic behind, is big as well. If you did <a href="http://es.wikipedia.org/wiki/VBA">VBA</a> programming you know what I&#8217;m talking about.    <br />We needed a clean and extensible design. So we decided to use the<a href="http://practices.gotdotnet.com/projects/cab"> Composite UI Application Block</a> and the <a href="http://www.gotdotnet.com/codegallery/codegallery.aspx?id=941d2228-3bb5-42fd-8004-c08595821170">Smart Client Software Factory</a>, because:</p>  <ul>   <li>It provided us with a Dependency Injection container (<a href="http://www.gotdotnet.com/codegallery/codegallery.aspx?id=e915f307-c1c6-47c4-8ea0-cb4f0346fba0">ObjectBuilder</a>) </li>    <li>Leverage the<a href="http://www.martinfowler.com/eaaDev/uiArchs.html"> MVP pattern</a> which is very <a href="http://staff.southworks.net/blogs/johnny/archive/2006/03/15/258.aspx">TDD</a>-friendly </li>    <li>Separate functionality in different modules</li> </ul> We realized that the key for being successful was the orchestration between the spreadsheet and the services. This is where TDD proved to be the correct path because allowed us to design this orchestration in a clean way.  <br />The following illustration put it more clear.  <p><a href="http://blogs.southworks.net/jhalife/files/2008/06/mvp.png"><img height="279" alt="MVP" src="http://blogs.southworks.net/jhalife/files/2008/06/mvp-thumb.png" width="446" border="0" /></a> </p>  <ul>   <li>The View is the spreadsheet </li>    <li>The Presenter performs the business logic and he knows about its view and services by their interfaces </li>    <li>The Services communicate with Team Foundation Server to retrieve workitems.</li> </ul> The following picture describes our solution  <br /><a href="http://blogs.southworks.net/jhalife/files/2008/06/mvp2.jpg"><img height="239" alt="MVP2" src="http://blogs.southworks.net/jhalife/files/2008/06/mvp2-thumb.jpg" width="425" border="0" /></a>   <br />In the retrospective after finishing this project, we realized two things:  <ul>   <li>TDD was extremely useful to come up with a clean design that provided loosely coupling between the components </li>    <li>In the final stages of the project, we met with a lot of technical details regarding VSTO and Excel and it was hard to keep the unit tests up to date. This is something that we are looking to improve in the following projects</li>    <pre>[TestMethod]
+<span style="color: blue">public void </span>CheckValidationAdded()
+{
+    presenter.PopulateLists();
+    Assert.IsTrue(view.FeatureValidated);
+    Assert.IsTrue(view.OwnerValidated);
+    Assert.IsTrue(view.ItemOrGroupValidated);
+}</pre>
+  <a href="http://11011.net/software/vspaste"></a></ul>
+
+<p>In the example above we tested that when the PopulateList method is called the Presenter behaves properly that means to call AddFeatureValidation, AddOwnerValidation and&#160; AddItemOrGroupValidation methods. <b>UPDATE</b>: To take a deep dive in this check my recent post about <a href="http://staff.southworks.net/blogs/johnny/archive/2006/09/01/786.aspx">How-To write MVP using TDD</a></p>

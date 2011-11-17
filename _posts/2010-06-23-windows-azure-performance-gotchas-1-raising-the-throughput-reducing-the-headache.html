@@ -1,0 +1,48 @@
+--- 
+layout: post
+title: "Windows Azure Performance Gotchas #1, raising the throughput reducing the headache"
+published: true
+meta: 
+  _edit_lock: "1287036441"
+  _edit_last: "42"
+tags: 
+- Emerging Technology
+type: post
+status: publish
+---
+<p>Lately, we've been working on a Windows Azure Project with huge load, really high peaks. During the project we got the following "gotcha moments" that I'll be trying to summarize throughout the post and thru a series of post I expect to write.</p>
+<h3>If you are using WCF, you must tweak it</h3>
+<p>On <a href="http://blog.iserviceoriented.com/">iServiceOriented.com</a>, <strong>there was this post about tweaking WCF that still valid up-to-day</strong>. WCF is broken by default, and if you were planning using it on Windows Azure (or even your own servers) you must tweak it with all the performance optimizations, except that you are fine with a lousy 10 requests per second.</p>
+<h5>Gotcha #1: Follow the performance on "<a href="http://old.iserviceoriented.com/blog/post/Configuring+Performance+Options+-+WCF+Gotcha+3.aspx">WCF Gotchas 3: Configuring Performance Options</a>"</h5>
+
+<h3>RetryPolicy can be evil</h3>
+<p><tt>RetryPolicy</tt> is the mechanism used by the <a href="http://msdn.microsoft.com/en-us/library/ee741723.aspx">Windows Azure Storage Client</a> to prevent the users from its own service fails. As the idea itself rocks, implementation wasn't necessarily done for your scalability needs.</p>
+
+<p><strong>When writing high traffic services you might want to keep the least number of threads or at least all of the identified</strong>, the built-in <tt>RetryPolicy</tt> hides the underlying complexity of performing retries when the service fails but it also hides the <tt>Thread</tt> usage from you which at this scale is critical.</p>
+<h5>Gotcha #2: Disable the built-in RetryPolicy</h5>
+<p>By using <tt><a href="http://msdn.microsoft.com/en-us/library/microsoft.windowsazure.storageclient.retrypolicies.noretry.aspx">RetryPolicies.NoRetry</a></tt> you can prevent your app for creating threads just to ensure that an action has been executed, and if you need your app to retry for an eventual Service Availability issue, write your own policy.</p>
+
+<p>If you need inspiration, you can check these snippets for <a href="http://gist.github.com/449695"><tt>RetryPolicy</tt></a> and another thing that you should consider when doing this type of things, like adding an <a href="http://gist.github.com/449714"><tt>Extension Method</tt></a> to identify whether an exception is "Retry-able" or not.</p>
+<h3>Let Windows Azure Storage handle it</h3>
+<p>"Cloud Computing" brought Computing up to a whole new level, nowadays developers are able to tell how much a design decision cost. This is stunning, now all those performance optimizations that you always wanted but never had the chance to implement have a strong economical justification (or not).</p>
+
+<p>Whenever you're exposing data to a client thru a (web)service in Windows Azure your paying for I/O and Compute Hours. This costs are distributed as transfer from/to Storage to the Service and from/to Service to the Client.</p>
+
+<p>Now consider the following, the reference data of your application (data pretty much the same for all the users) can be consumed by the Client straight from Storage instead. Now the cost distribution radically changes to be I/O from Windows Azure Storage to Client, no more Compute Time nor scalability headaches.</p>
+
+<h5>Gotcha #3: Deflect load to Windows Azure Storage as much as you can</h5>
+
+<p><span style="font-weight: normal">Redirecting the load to Windows Azure not only saves you some bucks from Computing Power and I/O but also take out the pain of having to scale up your services, since Microsoft is the responsible of scaling it up.</span></p>
+
+<p>When doing this remember that Windows Azure Storage is RESTful and all the optimization that can be performed at the transport level (like Caching, Expiration, GZip, etc) perfectly fit here, <a href="http://en.wikipedia.org/wiki/JSON#JSONP">and if it's a javascript client take a look at JSON(P)</a> (JSON is much more efficient than XML).</p>
+<h3>Livin' on the edge</h3>
+<p>Experience has proven that if you live on the latest VM Image by Windows Azure Team your performance and stability will increase as they ship new images.</p>
+
+<h5>Gotcha #4: Configure your Hosted Service Deployment to use the latest-available Virtual Machine</h5>
+
+<p>Except your code has compatibility issues with .NET 4 or issues with .NET 3.5 SP(x) you should live always on the latest VM image. This can be configured using the <a href="http://code.msdn.microsoft.com/windowsazuremmc">Windows Azure MMC</a> and <strong>setting the Virtual Machine Image Version to "*" (star)</strong></p>
+
+<p>I expect to continue writing about the different patterns, gotchas and stuff we figured out while working on Windows Azure, so stay tuned!</p>
+
+<p>thanks,<br />
+~johnny</p>

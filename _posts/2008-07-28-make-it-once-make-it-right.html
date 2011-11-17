@@ -1,0 +1,91 @@
+--- 
+layout: post
+title: Make it once , make it right!
+published: true
+meta: 
+  _edit_last: "42"
+  _edit_lock: "1217464666"
+tags: 
+- solution architecture
+- TDD
+type: post
+status: publish
+---
+Almost form the beginning of my blog,  I started writing about Test-Driven-Development <a href="http://blogs.southworks.net/jhalife/2007/02/21/how-does-tdd-helps-on-programming-decoupled-components/">[1]</a> <a href="http://blogs.southworks.net/jhalife/2006/09/01/how-to-write-mvp-using-tdd/">[2]</a> <a href="http://blogs.southworks.net/jhalife/2006/08/11/how-cab-and-tdd-helps-doing-better-designs/">[3]</a> <a href="http://blogs.southworks.net/jhalife/2006/03/15/tdd-using-microsoft-visual-studio-team-edition/">[4]</a> <a href="http://blogs.southworks.net/jhalife/2006/03/15/test-driven-development/">[5]</a> that now was renamed by the Agile Gang  as <em>Behavior Driven Design. </em>That new name is kind of cool and fancy (Oh these agilists always looking for new adepts) but there's a truth and a strong rationale behind what they call BBD.
+
+I wrote this post after a long time practicing TDD, this <em>Truths and Myths </em>are based on my personal experience and the knowledge acquired with time. You might disagree with some, you will love others, but this post is an exercise for my self trying to dump all what I've learnt in these years practicing TDD.
+
+I've divided the post in three parts:
+<ul>
+	<li><strong>Myths. </strong>These are the things I heard while working as consultant, stuff that showed up while discussing with colleges or things that came up while discussing with friends.</li>
+	<li><strong>Truths.</strong> These are almost the same as above but mostly positive things that demonstrate that there's value on applying this practice.</li>
+	<li><strong>My TDD Zen Garden. </strong>This are tips and tools that I used while doing TDD, they're not mandatory or maybe part of the official practice. There I'm just sharing my personal tips and thoughts.</li>
+</ul>
+<h3>5 Myths about TDD/BDD</h3>
+<h4>Myth 1: "Tests are for testers"</h4>
+That's my favorite one, when people don't understand TDD or are just too lazy to write the tests they claim for the "Test is for testers". Although the name has the word test, it doesn't necessarily means that your testing as a tester would do it.
+<h4>Myth 2: "Oh buddy, if I wrote them it'll take me twice"</h4>
+Ok some people think about writing the tests first as some kind of time consuming, useless, non-sense activity. Those that think like that are often the ones that never thought or read about <em>Re-work</em>  there <a href="http://www.sei.cmu.edu/pub/documents/articles/pdf/psp.qual.pdf">are some great papers from Watts Humphrey</a> and <a href="http://www.sei.cmu.edu">CMU-SEI</a> Crew about this. If you had the tests to validate and verify your work, you're one step closer to avoid rework.
+<h4>Myth 3: "I'm bug free , I had 100% Code Coverage"</h4>
+This might be controversial,  but after doing some deep thinking on this and listening to <a href="http://www.hanselminutes.com/default.aspx">Scott Hanselman podcasts</a>, I realized that 100% Code Coverage isn't the best. Code Coverage is a negative metric, it's about where we should focus are testing intentions based on what we've left uncover. As far as I researched, there's no tool to measure code coverage by paths (this can be fairly accomplished by hand). So 100% isn't bug free.
+<h4>Myth 4: "If I apply incremental design techniques based on TDD, I end up just with a huge test method"</h4>
+That's more than a Myth, that's a mistake, when doing TDD it's always a matter of starting to cross tests from the lists. People often think that as the method to be tested evolves the original test evolves with it. Well, for me it's that as you move forward you add new tests. So your fixture becomes a living, and breathing component documentation.
+<h4>Myth 5: "Doing TDD covers our team from doing functional testing"</h4>
+That's something that I heard too much, in this case the Myth or assumption is not about people using it wrong, this is about misunderstanding its power. TDD as I titled this post is about letting the design to emerge by expression on a bunch of lines of code our intention for that component. Also the <em>testability </em>for components (the new <em>buzz word</em>) will help us to understand coupling (WARNING! this also might led you to over engineering).
+<h3>5 Truths about TDD/BDD</h3>
+<h4>Truth 1: "The TDD motivation is about writing clean code that works"</h4>
+By writing the code needed just to make the test passes you are ensuring that your code fulfils just the test requirements and also that there isn't dead code, unwanted code or other sort of code horrors.
+<h4>Truth 2: "TDD outcome is a living breathing documentation for the component"</h4>
+That's one of my favorites things about Test Driven Development while you're writing the tests your expressing the rationale behind those lines and more than that the intended use. When a new developer arrives to a project, if you can hand out a couple of fixtures for him to look at, you'll probably get him up on speed faster than it would take if he just have to read the code.
+<h4>Truth 3: "By applying TDD you end up with well factored code"</h4>
+Some people think about all the decoupling stuff associated to TDD as some kind of black art or magic. Truth to be told, this principle applies painless and it's harder to realize that you're doing it than doing it. While you are expressing the intention and how the object should be have you're defining almost ad-hoc what it shouldn't do. Writing tests is determining responsibilities for components and when you define those, you're already decoupling your objects.
+<h4>Truth 4: "Doing TDD increases the motivation"</h4>
+While setting micro-goals to yourself and accomplishing them you start to fell better, think of it as 3 years projects, with thousands of man hours to be invested. How do you get the fell of moving forward and don't fall on the depression of writing code that is going nowhere. Well by simply setting a test for your code, you start to fell confident about what you're doing and that gets you the feeling of progress as the green lights for your test cases are on.
+<h4>Truth 5: "There's no silver bullet"</h4>
+This might be the most discouraging truth I'd ever written but the true doesn't hurt. You may get all the benefits of doing TDD but you still need peer reviews, code reviews, analyze your code against formal computer science metrics of complexity and coupling, and all that stuff. I felt like you maybe be feeling when I read the same title on the Mythical Man Month, I thought about that book about the great software engineering problem solver but Mr. Brooks Jr. was pretty clear and I'm agree, there's no silver bullet and TDD is just another great practice to use in the fight against the bug count and defect ratio.
+<h3>My TDD Zen Garden</h3>
+These ten tips are what I call my TDD Zen Garden, they consist in 10 things that use, think about or realized while practicing TDD for about +4 years. As I said on my last Truth ("there's no silver bullet") these are just practices, and I encourage you to challenge them, try to defeat and destroy them, because at that point you'll have something to teach the rest of the world or just me, and that idea fight is really enriching.
+<h4>Tip 1: "Write tiny and focused test methods that check only one aspect of your code"</h4>
+If you method can't be tested with 2 or 3 assertions, that's code smells. The rationale behind this is to write method with less responsibilities and generate a well factored code.  A single method might take 2 or 3 test cases to test the alternative paths but a well written method will just need one to test it's core functionality.
+<h4>Tip 2: "Avoid fragile assertions on human readable text such as error or flash messages"</h4>
+Try to write your tests (and your code) in order that it can be checked without doing strange things, like converting case or stuff like that. Tests are used to verify and validate that the code does what it needs to do. Think of it as an equation, don't try to test things that might become messy.
+<h4>Tip 3: "Use Code Coverage Tools"</h4>
+Although all the things I said about Code Coverage percentage being a negative metric, it's useful to know what aren't you testing. Some people might think that when you find a line that isn't tested what you should do is to write a test that passes over that line. My approach is a little bit different, if I find something that isn't covered I just go and delete it. If that was something that I really need it will appear again when the time is right.
+<h4>Tip 4: "Keep the test logic inside the test method"</h4>
+As we discussed previously on this post, test are living and breathing documentation for the component. Do not try to refractor it in order to reuse, test methods aren't intended to be productive code, they're documentation and development support. Do no save space or try to reduce its numbers of lines, keep it tight, make it atomic and reduce its dependencies. That will make it more readable for people.
+<h4>Tip 5: "Use <em>mocking </em>frameworks"</h4>
+This is because mocks (pieces of code used to simulate another component) are just for testing proposes. People often fall in writing huge mocks, that often do too much and even worse they end up testing them.
+
+Mock Frameworks, are useful because all the interaction logic stills inside the test method and as I said before the more information you give inside the test case the better. I clearly don't have any favorite one, but <a href="http://code.google.com/p/moq">MoQ</a> and <a href="http://www.ayende.com/Blog/archive/2007/03/28/Rhino-Mocks-3.0-Released.aspx">Rhino Mocks</a> are two that I often use and mostly recommend.
+<h4>Tip 6: "Don't rely on context data for your tests results"</h4>
+I often heard that some test are failing because of data that needs to be on the database isn't there. I prefer to do the insertion and deletion and everything that needs to be done on the test method I don't rely on existing data because that will you to a fragile assertion (<em>See tip #2 for more info</em>).
+<h4>Tip 7: "Use Transactions instead of Tests Databases"</h4>
+People often create bunches of databases to test against, I personally prefer to wrap my whole test inside a transaction. That let's me play around without screwing up the database and even better I don't fall on relying on Context Data for my tests. (<em>See tip#6 for more info</em>).
+<div>
+<pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">[TestMethod]
+<span style="color: #0000ff">public</span> <span style="color: #0000ff">void</span> MyTestMethod()
+{
+    <span style="color: #0000ff">using</span>(TransactionScope ts = <span style="color: #0000ff">new</span> TransactionScope())
+    {
+        <span style="color: #008000">//write all the test logic here.</span>
+    }
+}</pre>
+</div>
+When the using scope finishes, it will automatically rollback the transaction.
+<h4>Tip 8: "Make your test cases atomic"</h4>
+Do not rely on other tests to be running in order to write your test, do not make any tests dependant to other. Write you tests as if they were intended to run on isolation. This will help you troubleshoot a problem when some test fails.
+<h4>Tip 9: "Do not hesitate on long tests names"</h4>
+I'll continue insisting that test are living and breathing documentation of the project, so avoid naming your tests as <em>ShouldThrowException </em>or something that doesn't provide an insight of what's going on to the reader.
+<div>
+<pre style="padding-right: 0px;padding-left: 0px;font-size: 8pt;padding-bottom: 0px;margin: 0em;width: 100%;color: black;padding-top: 0px;font-family: consolas, 'Courier New', courier, monospace">[TestMethod]
+<span style="color: #0000ff">public</span> <span style="color: #0000ff">void</span> ShouldThrowExceptionWhenInvalidCustomerNameIsPassed()
+{
+}</pre>
+</div>
+The name depicted above is an example on how I like tests method to be named.
+<h4>Tip 10: "Be consistent, methodical, and patient"</h4>
+It happens event to the best developers and TDD practitioners that at some point of time they go nuts and think about throwing all the fixtures and crack code as fast as they can in order to see their new creation moving. Be patient, consistent and methodical, follow always the process. Software isn't just built and thrown away, people will have to maintain your baby so please be considered and be thoughtful and polite when your self because at some point (even the best developer) you will have to troubleshoot your code.
+
+thanks,
+
+~johnny

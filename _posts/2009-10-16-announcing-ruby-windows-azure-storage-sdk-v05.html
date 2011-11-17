@@ -1,0 +1,55 @@
+--- 
+layout: post
+title: Announcing Ruby Windows Azure Storage SDK - v.0.5 !!!
+published: true
+meta: 
+  _edit_last: "42"
+  _edit_lock: "1255726996"
+tags: []
+
+type: post
+status: publish
+---
+Hey, after talking, talking and talking about the possibilities of building a Windows Azure Storage SDK for Ruby, I finally got together a couple of ideas and develop the v.0.5. I'm still needing to write a decent sample application but now it has more resources that previous gems had.
+
+For the <strong>project source code and pretty basic documentation</strong> go to <strong><a href="http://github.com/johnnyhalife/waz-storage">http://github.com/johnnyhalife/waz-storage</a></strong>.
+
+For the whole <strong>API documentation</strong> refer to <strong><a href="http://waz-storage.heroku.com">http://waz-storage.heroku.com</a></strong>.
+<h2>What is Ruby Windows Azure Storage SDK (a.k.a waz-storage)?</h2>
+A simple implementation of Windows Azure Storage API for Ruby, inspired by the S3 gems and self experience of dealing with queues. The major goal of the whole gem is to enable ruby developers, like me =), to leverage Windows Azure Storage features and have another option for cloud storage.
+
+The whole gem is implemented based on Microsoft’s specs from the communication and underlying service description and protocol (REST). The API is for Ruby developers built by a ruby developer. I’m trying to follow idioms, patterns and fluent type of doing APIs on Ruby.
+
+This work isn’t related at all with StorageClient Sample shipped with Microsoft SDK and written in .NET, the whole API is based on my own understanding, experience and values of elegance and ruby development.
+
+Full documentation for the gem is available at <a href="http://waz-storage.heroku.com">waz-storage.heroku.com</a>
+<h2>Scenario Idea</h2>
+The gem was thought having <a href="http://heroku.com">heroku.com</a> in mind as it is my main Ruby hosting vendor. The basic idea can be expressed with the following diagram:
+
+<img src="http://files.me.com/johnny.halife/5j65mq" alt="Scenario Idea" />
+
+As you can see there's no need (and no personal desire) of hosting your application in Windows Azure or even writing it on .NET (or Windows needed at all).
+<h2>How does this differ from <em>waz-blobs</em> and <em>waz-queues</em>?</h2>
+Well, this is a sum up of the whole experience of writing those gems and getting them to work together to simplify end user experience. Although there’re some breaking changes, it’s pretty backward compatible with existing gems.
+<h2>Open Standards</h2>
+The <em>waz-storage</em> model is built upon the REST API published by Microsoft for Windows Azure Storage Services following the HTTP Standard. It's basically a bunch of HTTP Requests with a special signature and some custom headers. The same API can be ported to any platform supporting a decent HTTP Stack.
+<h2>So, what?</h2>
+As in the latest posts, I won't include too much detail here since it's all explained at <a href="http://github.com/johnnyhalife/waz-storage">github.com/johnnyhalife/waz-storage</a> and the whole API is detailed (and documented) at <a href="http://waz-storage.heroku.com">waz-storage.heroku.com</a>.
+
+The future is bright, I strongly appreciate all your feedback, your tweets and the time spent on (at least) reading the code. I really love this whole experience, but I won't stop here, I'll be relaxing from this SDK for a week or so (maybe less) until I come back for doing Tables support and fixing the issues that users may have encounter.
+
+<h3>TODOs'</h3>
+There should be some samples or at least one Reference Implementation of the API, probably I'll be requesting help from other people in order to accomplish this, but I promise that some sample will be soon online so you can see the unveiled power of the Windows Azure Storage when running on Ruby.
+
+Also there's some support for Blocks that will be added, and some other sugar features for the application. 
+
+Time will tell, meanwhile you can comment, tweet or say whatever you want since I'll be listening to your feedback.
+
+<h3>Acknowledgment</h3>
+This time I'll make an special acknowledgment, besides my team, teammates, friends, and collegues at Southworks,  <a href="http://twitter.com/ezequielm">Ezequiel Morito</a> and <a href="http://twitter.com/jpdg">Juampi Garcia</a>. I want to thank and recognize that this work won't be online today if I didn't receive the advice from <a href="http://blogs.salias.com.ar">Martin Salias</a> who encouraged me to go further on spiking and publishing my spikes. 
+
+Thanks <a href="http://twitter.com/martinsalias">Martin</a>, I really appreciate your support and guidance.
+
+<br>
+<br>
+ 

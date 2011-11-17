@@ -1,0 +1,18 @@
+--- 
+layout: post
+title: ASP.NET 2.0 SetFocus Improvement
+published: true
+meta: {}
+
+tags: 
+- ASP.NET 2.0
+type: post
+status: publish
+---
+
+<P>A useful feature that ASP.NET lacks is the ability to assing the input focus to a particular control when page is displayed. In ASP.NET 2.0, the <EM>Page </EM>class is a purposely endowed with the <EM>Page.SetFocus </EM>method. The following code shows hot to set the focus to a <EM>TextBox </EM>control named <EM>EmailTextBox.</EM></P>
+<P><FONT face="Courier New" color="#000000" size="2"><FONT color="#0000ff">protected void <FONT color="#000000">Page_</FONT><FONT color="#000000">Load(</FONT>object <FONT color="#000000">sender,</FONT> </FONT><FONT color="#9acd32">EventArgs </FONT><FONT color="#000000">e)<BR></FONT>{<BR></FONT><FONT face="Courier New" color="#000000" size="2"><FONT size="2">   <FONT color="#0000ff">if</FONT>(<FONT color="#0000ff">this</FONT>.IsPostBack)<BR>   {<BR>      <FONT color="#0000ff">this</FONT>.SetFocus(EmailTextBox.ClientId);<BR>   }</FONT></FONT><FONT face="Courier New" color="#000000" size="2"><BR>)</FONT></P>
+<P><FONT face="Tahoma" size="2">The <EM>SetFocus</EM> method caches the ID of the Control and forces the <EM>Page </EM>class to generate ad hoc script code when the page is rendered. The following code shows an alternative approach to setting the input focus.<BR></FONT><FONT face="Tahoma" size="2"><BR><FONT color="#ff0000"><FONT color="#0000ff">&lt;</FONT><FONT color="#a52a2a">form</FONT> runat<FONT color="#0000ff">="server"</FONT> defaultFocus<FONT color="#0000ff">="EmailTextBox"</FONT> </FONT><FONT color="#0000ff">&gt;<BR></FONT></FONT><FONT face="Tahoma" size="2"><FONT color="#ff0000">.<BR>.<BR>.<BR><FONT color="#0000ff">&lt;/</FONT></FONT><FONT color="#a52a2a">form</FONT><FONT color="#0000ff">&gt;</FONT></FONT></P>
+<P><FONT face="Tahoma" size="2"><FONT color="#000000">You can set the <EM>DefaultFocus </EM>property on a form to denote which control should receive the focus. This is equivalent to calling <EM>SetFocus. </EM>The difference is that if one control at a time requests the focus through <EM>SetFocus, </EM>the fefault focus is ignored.</FONT></FONT></P>
+<P><FONT face="Tahoma" size="2"> </P></FONT>
+      
