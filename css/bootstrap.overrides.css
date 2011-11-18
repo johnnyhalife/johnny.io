@@ -106,7 +106,7 @@ ul.navigation {
 }
 
 /* stuff from disqus that I don't give a fuck */
-#dsq-content-stub, #dsq-options, #dsq-comments-title {
+#dsq-options {
 	display: none !important;
 }
 
