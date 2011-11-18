@@ -1,32 +1,37 @@
+/*****************************************************************************/
+/* Container, article, and main content
+/*****************************************************************************/
+
+body {
+	background: #F6F6F6 ;
+}
+
 div.container {
+	background: #fefefe;
 	-moz-box-shadow: 0 0 5px #888;
 	-webkit-box-shadow: 0 0 5px#888;
 	box-shadow: 0 0 10px #888;
 }
 
-div.container article {
-	padding: 20px;
-	width: 800px;
-	clear: both;
-	margin: 0px auto;
-}
+	div.container article {
+		padding: 20px;
+		width: 800px;
+		clear: both;
+		margin: 0px auto;
+	}
 
-div.container article h6 {
-		margin-top: -25px;
-		text-transform: none;
-}
+		div.container article h6 {
+				margin-top: -25px;
+				text-transform: none;
+		}
+		
+		div.container article p {
+			text-align: justify;
+		}
 
 div.container div#related {
 	padding: 20px;
 	width: 720px;
-}
-
-div.container {
-	background: #fefefe;
-}
-
-body {
-	background: #F6F6F6 ;
 }
 
 hr {
@@ -35,9 +40,18 @@ hr {
 	clear: both;
 }
 
-div.container article p{
-	text-align: justify;
+/*****************************************************************************/
+/* Pager
+/*****************************************************************************/
+
+div.pagination {
+	margin: 10px auto;
+	width: 550px;
 }
+
+/*****************************************************************************/
+/* Header - principal content (Howdy, and back)
+/*****************************************************************************/
 
 div.hero-unit {
 	padding: 10px 40px;
@@ -45,27 +59,60 @@ div.hero-unit {
 	min-height: 15px;
 }
 
-div.hero-unit h1 a, div.hero-unit h3 a:hover, div.hero-unit h3 a:active, div.hero-unit h3 a:visited  {
-	color: #000;
-	text-decoration: none;
+	div.hero-unit h1 a, div.hero-unit h3 a:hover, div.hero-unit h3 a:active, div.hero-unit h3 a:visited  {
+		color: #000;
+		text-decoration: none;
+	}
+
+	div.hero-unit p {
+		margin-top: 10px;
+	}
+
+	div.hero-unit span.label {
+		font-size: 17px;
+	}
+
+		div.hero-unit span.label a, div.hero-unit span.label a:hover, div.hero-unit span.label a:active, div.hero-unit span.label a:visited{
+			color: #fefefe;
+		}
+		
+	div.hero-unit span.back a, div.hero-unit span.back a:hover, div.hero-unit span.back a:visited, div.hero-unit span.back a:active {
+		text-decoration: none;
+		color: #000;
+	}
+	
+
+/*****************************************************************************/
+/* Top Navigation Links (twitter, rss, and github)
+/*****************************************************************************/
+ul.navigation {
+	margin: 0px;
+	padding: 0px;
+	float: right;
 }
 
-div.hero-unit p {
-	margin-top: 10px;
+	ul.navigation li {
+		list-style: none inside;
+		display: inline-block;
+		margin: 0px 3px;
+	}
+	
+/*****************************************************************************/
+/* Disqus + Comments
+/*****************************************************************************/
+#comments {
+	padding: 5px 30px;
+	margin: 0px auto;
 }
 
-div.hero-unit span.label {
-	font-size: 17px;
+/* stuff from disqus that I don't give a fuck */
+#dsq-content-stub, #dsq-options, #dsq-comments-title {
+	display: none;
 }
 
-div.hero-unit span.label a, div.hero-unit span.label a:hover, div.hero-unit span.label a:active, div.hero-unit span.label a:visited{
-	color: #fefefe;
-}
-
-div.pagination {
-	margin: 10px auto;
-	width: 550px;
-}
+/*****************************************************************************/
+/* Footer
+/*****************************************************************************/
 	
 footer {
 	width: 100%;
@@ -74,34 +121,20 @@ footer {
 	height: 16px;
 }
 
-footer p {
-	text-align: center;
-	text-shadow: black 0.1em 0.1em 0.2em;
-	margin: -10px 0;
+	footer p {
+		text-align: center;
+		text-shadow: black 0.1em 0.1em 0.2em;
+		margin: -10px 0;
 	
-}
+	}
 
-footer p a, footer p a:hover, footer p a:visited {
-	color: #efaa09;
-}
-
-span.back a, span.back a:hover, span.back a:visited, span.back a:active {
-	text-decoration: none;
-	color: #000;
-}
-
-ul.navigation {
-	margin: 0px;
-	padding: 0px;
-	float: right;
-}
-
-ul.navigation li {
-	list-style: none inside;
-	display: inline-block;
-	margin: 0px 3px;
-}
-
+		footer p a, footer p a:hover, footer p a:visited {
+			color: #efaa09;
+		}
+		
+/*****************************************************************************/
+/* MicroFormats
+/*****************************************************************************/
 .vcard {
 	display: none;
 }
