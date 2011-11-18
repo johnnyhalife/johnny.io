@@ -128,21 +128,13 @@ ul.navigation {
 	
 footer {
 	width: 100%;
-	background: rgba(0,0,0,0.8);
 	color: #fefefe;
-	height: 16px;
 }
 
 	footer p {
 		text-align: center;
 		text-shadow: black 0.1em 0.1em 0.2em;
-		margin: -10px 0;
-	
 	}
-
-		footer p a, footer p a:hover, footer p a:visited {
-			color: #efaa09;
-		}
 		
 /*****************************************************************************/
 /* MicroFormats
