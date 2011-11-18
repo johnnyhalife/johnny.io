@@ -85,18 +85,18 @@ footer p a, footer p a:hover, footer p a:visited {
 	color: #efaa09;
 }
 
-navbar span a, navbar span a:hover, navbar span a:visited, navbar span a:active {
+span.back a, span.back a:hover, span.back a:visited, span.back a:active {
 	text-decoration: none;
 	color: #000;
 }
 
-navbar ul.navigation {
+ul.navigation {
 	margin: 0px;
 	padding: 0px;
 	float: right;
 }
 
-navbar ul.navigation li {
+ul.navigation li {
 	list-style: none inside;
 	display: inline-block;
 	margin: 0px 3px;
