@@ -25,6 +25,17 @@ div.container {
 				text-transform: none;
 		}
 		
+		div.container article h6 em {
+			color: #808080;
+			font-weight: normal;
+			font-style: normal;
+		}
+		
+		div.container article h6 a, div.container article h6 a:hover, div.container article h6 a:active, div.container article h6 a:visited {
+			color: #808080;
+			font-weight: normal;
+		}
+		
 		div.container article p {
 			text-align: justify;
 		}
