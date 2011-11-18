@@ -26,14 +26,15 @@ div.container {
 		}
 		
 		div.container article h6 em {
-			color: #808080;
+			color: #707070;
 			font-weight: normal;
 			font-style: normal;
 		}
 		
 		div.container article h6 a, div.container article h6 a:hover, div.container article h6 a:active, div.container article h6 a:visited {
-			color: #808080;
+			color: #707070;
 			font-weight: normal;
+			text-decoration: none;
 		}
 		
 		div.container article p {
