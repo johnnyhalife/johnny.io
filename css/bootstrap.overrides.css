@@ -127,13 +127,17 @@ ul.navigation {
 /*****************************************************************************/
 	
 footer {
+	border: 0px;
+	color: #404040;
 	width: 100%;
-	color: #fefefe;
 }
 
 	footer p {
+		color: #606060; 
+		font-size: 11px;
+		margin: 0px; 
 		text-align: center;
-		text-shadow: black 0.1em 0.1em 0.2em;
+		text-shadow: #efefef 0px 0px 0px;
 	}
 		
 /*****************************************************************************/
