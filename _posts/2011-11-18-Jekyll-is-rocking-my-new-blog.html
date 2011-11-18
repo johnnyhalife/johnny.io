@@ -1,0 +1,65 @@
+--- 
+layout: post
+title: Jekyll is rocking my new blog!
+published: true
+---
+<p>Long gone Wordpress days have gone. Previously, <a href="http://blogs.southworks.net/jhalife">I used to have my blog here</a>, under <a href="https://blogs.southworks.net/">Southworks blogs</a>, 
+	 that are currently hosted using <a href="http://wordpress.com">Wordpress</a> but I decided to move on.</p>
+
+<p>I found myself frustrated with the way we publish on our blogs, like: <a href="http://en.wikipedia.org/wiki/WYSIWYG">WYSIWYG editors</a>, 
+	 <a href="http://explore.live.com/windows-live-writer">Windows Live Writer</a>, among others. My creative process it's much more rudimentary: I basically open <a href="http://macromates.com/">TextMate</a> 
+   and words start flowing, then when I need to get it posted on Wordpress is when the <em>"I'll never publish it"</em> moment appears.</p>
+
+<p>Writing is something that I enjoy, it's something that comes and goes from my mind but I need to get better at it too. I really like 
+	 writing, although I might not have lot of interesting things to share, I take it as an exercise.</p>
+
+<p>Since excuses are easy, I wanted to remove one layer of frustration and that's why I created this new blog.</p>
+
+<h3>What did I do?</h3>
+
+<p>I found that <a href="http://twitter.com/mojombo">Mojombo</a> from <a href="https://github.com/mojombo/jekyll">Github has a project called "Jekyll"</a>
+	 this is (to simplify) a <em>git-based</em> blog engine. You write using HTML/Markdown and then you push it to your app (and the full 
+	 site gets regenerated).</p>
+	
+<p>With Jekyll I got what I wanted: <em>an easy to use publishing platform that it's extensible enough so I can hack my own shit</em>.</p>
+
+<p>The theme you're looking at right now it's based on <a href="http://twitter.github.com/bootstrap/">Bootstrap, from Twitter</a>. I wanted an easy and 
+ 	 clean UI and Bootstrap gave me a great starting point.</p>
+	
+<p>Comments were something I was intrigued by, but then I remember that <a href="http://drewby.com">my friend Drew Robbins</a> mentioned <a href="http://disqus.com/"> disqus</a>
+	and I loved it. Basically I've outsourced my commenting platform and the service I'm getting is awesome.</p>
+	
+<p>Last but not least, hosting was something I need to solve, and I ended up using <a href="http://heroku.com">Heroku (for free!)</a> with the new
+	amazing <a href="http://devcenter.heroku.com/articles/cedar">cedar platform</a>. Creating	the site you're seeing this hosted was as easy as:</p>
+	
+<pre class="prettyprint lang-sh linenums">
+?> sudo gem install heroku 
+
+# it's important to mention the stack in here
+?> heroku create johnnyhalife-blog --stack cedar
+</pre>
+
+<p>And then you need your Gemfile with Jekyll and its dependencies (RedCloth at least). Since we are using cedar stack, we'll need to 
+	craft a <a href="http://devcenter.heroku.com/articles/procfile">Procfile</a> (I've already <a href="https://github.com/johnnyhalife/johnny.io">published
+ mine on github</a>). It's not rocket science, 	your Procfile should look like </p>
+	
+<pre class="prettyprint lang-rb linenums">
+web:  jekyll --server $PORT
+</pre>
+
+<h3>Round up</h3>
+
+<p>Throughout all this process (that only took me a day) I've learnt lots of new things, so I thought it would be cool if "open source my blog" and I pushed 
+	 it to github. You can easily clone it, and use it as a base for your own. What you will get: </p>
+
+<ul>
+	<li>Jekyll powered blog</li>
+	<li>Bootstrap based theme for your blog</li>
+	<li>Disqus enabled commenting platform</li>
+	<li>A script from getting your posts imported from Wordpress</li>
+	<li>A plug in for generating a sitemap.xml</li>
+</ul>
+
+<p>That's pretty much the story behind my <span class="label warning">brand new blog</span>, how, why and when.</p>
+
+<p>thanks, <br/>~johnny</p>
