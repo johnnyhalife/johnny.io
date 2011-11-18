@@ -101,3 +101,7 @@ ul.navigation li {
 	display: inline-block;
 	margin: 0px 3px;
 }
+
+.vcard {
+	display: none;
+}
