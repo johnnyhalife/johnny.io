@@ -71,8 +71,8 @@ div.hero-unit {
 	min-height: 15px;
 }
 
-	div.hero-unit h1 a, div.hero-unit h3 a:hover, div.hero-unit h3 a:active, div.hero-unit h3 a:visited  {
-		color: #000;
+	div.hero-unit h1 a, div.hero-unit h1 a:hover, div.hero-unit h1 a:active, div.hero-unit h1 a:visited  {
+		color: #404040;
 		text-decoration: none;
 	}
 
